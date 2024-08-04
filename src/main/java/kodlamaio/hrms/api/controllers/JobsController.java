@@ -16,7 +16,7 @@ public class JobsController {
 	
 	private JobService jobService;
 	
-	@Autowired //Spring projeyi tarayıp JobService'i implement eden class'tan insatnce oluşturulur
+	@Autowired //Spring projeyi tarayıp JobService'i implement eden class'tan instance oluşturulur
 	public JobsController(JobService jobService) {
 		super();
 		this.jobService = jobService;
