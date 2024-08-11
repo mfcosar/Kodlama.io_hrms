@@ -9,11 +9,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
 @Data
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED) //base tablolara bunu ekledik
 @Table(name="employee_confirms")
 public class EmployeeConfirm {
@@ -31,17 +35,5 @@ public class EmployeeConfirm {
 	
 	@Column(name="confirm_date")
 	private Date confirmDate;
-
-	public EmployeeConfirm() {
-		super();
-	}
-
-	public EmployeeConfirm(int id, int employeeId, boolean isConfirmed, Date confirmDate) {
-		super();
-		this.id = id;
-		this.employeeId = employeeId;
-		this.isConfirmed = isConfirmed;
-		this.confirmDate = confirmDate;
-	}
 
 }

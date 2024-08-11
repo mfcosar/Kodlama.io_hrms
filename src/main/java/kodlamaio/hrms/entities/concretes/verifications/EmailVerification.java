@@ -7,11 +7,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.Date;
 
 @Data
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)//base tablolara bunu ekledik
 @Table(name="verification_codes")
 public class EmailVerification {
@@ -29,19 +34,5 @@ public class EmailVerification {
 	
 	@Column(name="verification_date")
 	private Date verificationDate;
-
-	public EmailVerification() {
-		super();
-	}
-
-	public EmailVerification(int id, String code, boolean isVerified, Date verificationDate) {
-		super();
-		this.id = id;
-		this.code = code;
-		this.isVerified = isVerified;
-		this.verificationDate = verificationDate;
-	}
-	
-	
 
 }

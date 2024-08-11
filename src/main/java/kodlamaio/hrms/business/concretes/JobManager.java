@@ -6,6 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import kodlamaio.hrms.business.abstracts.JobService;
+import kodlamaio.hrms.core.utilities.results.DataResult;
+import kodlamaio.hrms.core.utilities.results.Result;
+import kodlamaio.hrms.core.utilities.results.SuccessDataResult;
+import kodlamaio.hrms.core.utilities.results.SuccessResult;
 import kodlamaio.hrms.dataAccess.abstracts.JobDao;
 import kodlamaio.hrms.entities.concretes.Job;
 
@@ -14,16 +18,23 @@ public class JobManager implements JobService{
 	
 	private JobDao jobDao;
 
-	@Autowired //Bu bir bağımlılık oluşturur, aslında concrete instance abstraction ile daha zayıf bağlı verilebilir
+	@Autowired // Bu bir bağımlılık oluşturur, aslında concrete instance abstraction ile daha zayıf bağlı verilebilir 
+			   // ama community'de genel kullanım bu şekilde
 	public JobManager(JobDao jobDao) {
 		super();
 		this.jobDao = jobDao;
 	}
 
 	@Override
-	public List<Job> getAll() {
+	public DataResult<List<Job>> getAll() {
 		
-		return this.jobDao.findAll();
+		return new SuccessDataResult<List<Job>>(this.jobDao.findAll(), "Data listelendi");
+	}
+
+	@Override
+	public Result add(Job job) {
+		this.jobDao.save(job);
+		return new SuccessResult("İş pozisyonu eklendi");
 	}
 
 }

@@ -6,10 +6,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name="job_titles")
 public class Job {
 
@@ -18,8 +23,9 @@ public class Job {
 	@Column(name="id")
 	private int jobId;
 	
+	
+	@NotBlank(message= "İş pozisyonu ismini giriniz!")
 	@Column(name="title")
 	private String jobTitle;
-	
 
 }
