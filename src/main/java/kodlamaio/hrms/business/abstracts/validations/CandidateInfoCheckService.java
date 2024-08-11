@@ -6,10 +6,10 @@ import kodlamaio.hrms.entities.concretes.Candidate;
 public interface CandidateInfoCheckService {
 	
 	Result checkAllFieldsEntered(Candidate candidate);
-	Result checkMernis(Candidate candidate);
-	Result checkEmailAndTcIdentityIsUnique(Candidate candidate);
-	Result checkEmailVerification(Candidate candidate);
-	Result isValidUser(Candidate candidate);
+	Result checkMernis(String tcIdentityNumber);
+	Result checkEmailAndTcIdentityIsUnique(String tcIdentityNumber, String email);
+	Result checkEmailVerification(int candidateId);
+	Result isValidCandidate(Candidate candidate); // All checks here
 	
 
 }

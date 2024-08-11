@@ -92,10 +92,27 @@ public class EmailVerificationManager implements EmailVerificationService{
 		return new SuccessResult("İş verene doğrulama kodu gönderildi.");
 	}
 
-
-
+	/*
 	@Override
 	public Result setVerificationCompleted(int emailVerificationId) {
+		
+		EmailVerification emailVerification = this.emailVerificationDao.getReferenceById(emailVerificationId); //getById ==> deprecated
+		emailVerification.setVerified(true);
+		emailVerification.setVerificationDate(new Date());
+		this.emailVerificationDao.save(emailVerification);
+		return new SuccessResult("Email doğrulaması tamamlandı.");
+	}*/
+
+	@Override
+	public Result setCandidateVerificationCompleted(int candidateId) {
+		
+		int emailVerificationId = 0;
+		
+		for (CandidateEmailVerification x: this.candidateEmailVerificationDao.findAll()) {
+			if (x.getCandidateId() == candidateId)
+				emailVerificationId = x.getId();
+		}
+		
 		EmailVerification emailVerification = this.emailVerificationDao.getReferenceById(emailVerificationId); //getById ==> deprecated
 		emailVerification.setVerified(true);
 		emailVerification.setVerificationDate(new Date());
@@ -103,8 +120,21 @@ public class EmailVerificationManager implements EmailVerificationService{
 		return new SuccessResult("Email doğrulaması tamamlandı.");
 	}
 
-
-
-	
+	@Override
+	public Result setEmployerVerificationCompleted(int employerId) {
+		
+		int emailVerificationId = 0;
+		
+		for (EmployerEmailVerification x: this.employerEmailVerificationDao.findAll()) {
+			if (x.getEmployerId() == employerId)
+				emailVerificationId = x.getId();
+		}
+		
+		EmailVerification emailVerification = this.emailVerificationDao.getReferenceById(emailVerificationId); //getById ==> deprecated
+		emailVerification.setVerified(true);
+		emailVerification.setVerificationDate(new Date());
+		this.emailVerificationDao.save(emailVerification);
+		return new SuccessResult("Email doğrulaması tamamlandı.");
+	}	
 
 }

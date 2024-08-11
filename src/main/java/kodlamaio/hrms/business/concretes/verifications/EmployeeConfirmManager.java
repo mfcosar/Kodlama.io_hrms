@@ -55,7 +55,7 @@ public class EmployeeConfirmManager implements EmployeeConfirmService{
 		
 		this.employeeConfirmDao.save(employeeConfirm);
 		
-		return new SuccessResult("İş veren onaylandı : " + employee.getFirstName());
+		return new SuccessResult("İş veren onaylandı: " +employee.getFirstName() );
 		
 	}
 
