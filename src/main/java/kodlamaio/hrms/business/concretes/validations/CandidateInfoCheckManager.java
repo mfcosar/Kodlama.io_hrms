@@ -9,27 +9,22 @@ import kodlamaio.hrms.core.utilities.results.ErrorResult;
 import kodlamaio.hrms.core.utilities.results.Result;
 import kodlamaio.hrms.core.utilities.results.SuccessResult;
 import kodlamaio.hrms.dataAccess.abstracts.CandidateDao;
-import kodlamaio.hrms.dataAccess.abstracts.verifications.CandidateEmailVerificationDao;
-import kodlamaio.hrms.dataAccess.abstracts.verifications.EmailVerificationDao;
 import kodlamaio.hrms.entities.concretes.Candidate;
-import kodlamaio.hrms.entities.concretes.verifications.CandidateEmailVerification;
+
 
 @Service
 public class CandidateInfoCheckManager implements CandidateInfoCheckService{
 	
 	private CandidateDao candidateDao;
 	private MernisAdapter mernisAdapter;
-	private CandidateEmailVerificationDao candidateEmailVerificationDao;
-	private EmailVerificationDao emailVerificationDao;
+
 
 	@Autowired
-	public CandidateInfoCheckManager(CandidateDao candidateDao, MernisAdapter mernisAdapter, 
-			CandidateEmailVerificationDao candidateEmailVerificationDao, EmailVerificationDao emailVerificationDao) {
+	public CandidateInfoCheckManager(CandidateDao candidateDao, MernisAdapter mernisAdapter) {
 		super();
 		this.candidateDao = candidateDao;
 		this.mernisAdapter = mernisAdapter;
-		this.candidateEmailVerificationDao = candidateEmailVerificationDao;
-		this.emailVerificationDao = emailVerificationDao;
+
 	}
 
 	@Override
@@ -70,19 +65,7 @@ public class CandidateInfoCheckManager implements CandidateInfoCheckService{
 			return new SuccessResult("Bu kullanıcı daha önce sisteme kaydedilmemiş.");
 	}
 
-	@Override
-	public Result checkEmailVerification(int candidateId) {
-		int id;
-		for (CandidateEmailVerification x: this.candidateEmailVerificationDao.findAll()){
-			if (x.getCandidateId() == candidateId) {	
-				id = x.getId();
-				if (this.emailVerificationDao.getReferenceById(id).isVerified())
-					return new SuccessResult("Bu kullanıcının email doğrulaması yapılmış.");
-			}
-		}
 
-		return new ErrorResult("Bu kullanıcının email doğrulaması henüz yapılmamış.");
-	}
 
 	@Override
 	public Result isValidCandidate(Candidate candidate) {

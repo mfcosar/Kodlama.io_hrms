@@ -8,5 +8,6 @@ public interface EmployerInfoCheckService {
 	Result checkAllFieldsEntered(Employer employer);
 	Result checkWebAndEmailDomainIsSame(String webAddress, String email);
 	Result checkEmailIsUnique(String email);
+	Result isValidEmployer(Employer employer); // All checks here
 
 }

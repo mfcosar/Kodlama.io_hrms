@@ -47,7 +47,7 @@ public class CandidateManager implements CandidateService{
 			// Burada aday email doğrulaması yaptı. 
 			this.emailVerificationService.setCandidateVerificationCompleted(candidate.getId());
 			
-			if (this.candidateInfoCheckService.checkEmailVerification(candidate.getId()).isSuccess()) {
+			if (this.emailVerificationService.checkCandidateEmailVerification(candidate.getId()).isSuccess()) {
 				this.candidateDao.save(candidate);
 				return new SuccessResult("Aday eklendi");
 			} 

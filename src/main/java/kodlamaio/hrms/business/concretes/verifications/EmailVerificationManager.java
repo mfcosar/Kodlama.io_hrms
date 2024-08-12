@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import kodlamaio.hrms.business.abstracts.verifications.EmailVerificationService;
 import kodlamaio.hrms.core.utilities.results.DataResult;
+import kodlamaio.hrms.core.utilities.results.ErrorResult;
 import kodlamaio.hrms.core.utilities.results.Result;
 import kodlamaio.hrms.core.utilities.results.SuccessDataResult;
 import kodlamaio.hrms.core.utilities.results.SuccessResult;
@@ -92,16 +93,6 @@ public class EmailVerificationManager implements EmailVerificationService{
 		return new SuccessResult("İş verene doğrulama kodu gönderildi.");
 	}
 
-	/*
-	@Override
-	public Result setVerificationCompleted(int emailVerificationId) {
-		
-		EmailVerification emailVerification = this.emailVerificationDao.getReferenceById(emailVerificationId); //getById ==> deprecated
-		emailVerification.setVerified(true);
-		emailVerification.setVerificationDate(new Date());
-		this.emailVerificationDao.save(emailVerification);
-		return new SuccessResult("Email doğrulaması tamamlandı.");
-	}*/
 
 	@Override
 	public Result setCandidateVerificationCompleted(int candidateId) {
@@ -135,6 +126,38 @@ public class EmailVerificationManager implements EmailVerificationService{
 		emailVerification.setVerificationDate(new Date());
 		this.emailVerificationDao.save(emailVerification);
 		return new SuccessResult("Email doğrulaması tamamlandı.");
-	}	
+	}
+
+
+
+	@Override
+	public Result checkCandidateEmailVerification(int candidateId) {
+		int id;
+		for (CandidateEmailVerification x: this.candidateEmailVerificationDao.findAll()){
+			if (x.getCandidateId() == candidateId) {	
+				id = x.getId();
+				if (this.emailVerificationDao.getReferenceById(id).isVerified())
+					return new SuccessResult("Bu kullanıcının email doğrulaması yapılmış.");
+			}
+		}
+
+		return new ErrorResult("Bu kullanıcının email doğrulaması henüz yapılmamış.");
+	}
+
+
+
+	@Override
+	public Result checkEmployerEmailVerification(int employerId) {
+		int id;
+		for (EmployerEmailVerification x: this.employerEmailVerificationDao.findAll()){
+			if (x.getEmployerId() == employerId) {	
+				id = x.getId();
+				if (this.emailVerificationDao.getReferenceById(id).isVerified())
+					return new SuccessResult("Bu kullanıcının email doğrulaması yapılmış.");
+			}
+		}
+
+		return new ErrorResult("Bu kullanıcının email doğrulaması henüz yapılmamış.");
+	}
 
 }

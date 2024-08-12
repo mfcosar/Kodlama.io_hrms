@@ -13,8 +13,9 @@ public interface EmailVerificationService {
 	DataResult<List<EmailVerification>> getAll();
 	Result generateVerificationEmailForCandidate(Candidate candidate);
 	Result generateVerificationEmailForEmployer(Employer employer);
-	//Result setVerificationCompleted(int emailVerificationId);
 	Result setCandidateVerificationCompleted(int candidateId);
 	Result setEmployerVerificationCompleted(int employerId);
+	Result checkCandidateEmailVerification(int candidateId);
+	Result checkEmployerEmailVerification(int employerId);
 
 }

@@ -15,6 +15,7 @@ public class EmployerInfoCheckManager implements EmployerInfoCheckService{
 	
 	private EmployerDao employerDao;
 
+
 	@Autowired
 	public EmployerInfoCheckManager(EmployerDao employerDao) {
 		super();
@@ -88,6 +89,15 @@ public class EmployerInfoCheckManager implements EmployerInfoCheckService{
 			}
 		}
 		return new SuccessResult("Email sisteme kayıtlı değil");
+	}
+
+	@Override
+	public Result isValidEmployer(Employer employer) {
+		if (checkAllFieldsEntered(employer).isSuccess() && checkWebAndEmailDomainIsSame(employer.getWebAddress(), employer.getEmail()).isSuccess()
+				&& checkEmailIsUnique(employer.getEmail()).isSuccess())
+			return new SuccessResult("Bu şirketin bilgileri kayıt için uygundur.");
+		
+		else return new ErrorResult("Bu şirketin bilgileri kayıt için uygun değildir.");
 	}
 
 }

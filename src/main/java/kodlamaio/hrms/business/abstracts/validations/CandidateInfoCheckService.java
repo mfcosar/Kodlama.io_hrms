@@ -8,7 +8,6 @@ public interface CandidateInfoCheckService {
 	Result checkAllFieldsEntered(Candidate candidate);
 	Result checkMernis(String tcIdentityNumber);
 	Result checkEmailAndTcIdentityIsUnique(String tcIdentityNumber, String email);
-	Result checkEmailVerification(int candidateId);
 	Result isValidCandidate(Candidate candidate); // All checks here
 	
 
