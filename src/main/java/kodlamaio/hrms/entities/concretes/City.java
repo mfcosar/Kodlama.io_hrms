@@ -11,30 +11,26 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @Entity
+@Table(name="cities")
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="job_titles")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "jobAdvertisements"})
-public class Job {
-
+public class City {
+	
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY) 
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="id")
-	private int jobId;
+	private int id;
 	
-	
-	@NotBlank(message= "İş pozisyonu ismini giriniz!")
-	@Column(name="title")
-	private String jobTitle;
-	
-	@OneToMany(mappedBy = "job")
-	private List<JobAdvertisement> jobAdvertisements;
+	@Column(name="city_name")
+	private String cityName;
 
+	@OneToMany(mappedBy = "city")
+	private List<JobAdvertisement> jobAdvertisements;
 }

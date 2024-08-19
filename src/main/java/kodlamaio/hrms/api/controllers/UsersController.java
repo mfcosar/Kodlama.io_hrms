@@ -26,7 +26,7 @@ public class UsersController {
 		this.userService = userService;
 	}
 
-	@GetMapping("/getall") //Buradaki A harfini büyk yazdığım için tam 2 gündür bütün projeyi DB scriptten tut entitylere kadar defalarca yeniden gözden geçirdim!-1.8.2024
+	@GetMapping("/getall") 
 	public DataResult<List<User>> getAll(){
 		
 		return this.userService.getAll();

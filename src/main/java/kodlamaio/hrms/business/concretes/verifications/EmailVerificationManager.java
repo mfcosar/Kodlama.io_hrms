@@ -66,7 +66,7 @@ public class EmailVerificationManager implements EmailVerificationService{
 	}
 	
 	private  EmailVerification generateNewEmailVerificationCode() {
-		// new email verification
+		// new email verification 
 		EmailVerification emailVerification = new EmailVerification();
 		emailVerification.setCode("generateRandomCodeHere01234566789");
 		return emailVerification;

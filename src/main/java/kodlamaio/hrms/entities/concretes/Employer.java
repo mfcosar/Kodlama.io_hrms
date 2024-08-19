@@ -1,7 +1,12 @@
 package kodlamaio.hrms.entities.concretes;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -15,6 +20,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "employers")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "jobAdvertisements"})
 public class Employer extends User{
 	
 	@NotBlank(message= "Şirket ismini giriniz!")
@@ -29,6 +35,10 @@ public class Employer extends User{
 	@NotBlank(message= "Şirketinizin telefon numarasını giriniz!")
 	@Column(name="phone_number")
 	private String phoneNumber;
+	
+	
+	@OneToMany(mappedBy = "employer")
+	private List<JobAdvertisement> jobAdvertisements;
 
 	
 	
