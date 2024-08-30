@@ -2,14 +2,14 @@ package kodlamaio.hrms.business.concretes.cvManagers;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+//import org.springframework.web.multipart.MultipartFile;
 
 import kodlamaio.hrms.business.abstracts.cvServices.ImageService;
-import kodlamaio.hrms.core.adapters.cloudinary.CloudinaryFileService;
+import kodlamaio.hrms.core.adapters.cloudinary.FileService;
 import kodlamaio.hrms.core.utilities.results.DataResult;
 import kodlamaio.hrms.core.utilities.results.Result;
 import kodlamaio.hrms.core.utilities.results.SuccessDataResult;
@@ -24,10 +24,10 @@ public class ImageManager implements ImageService{
 	
 	private ImageDao imageDao;
 	private CandidateDao candidateDao;
-	private CloudinaryFileService cloudinaryFileService;
+	private FileService cloudinaryFileService;
 
 	@Autowired
-	public ImageManager(ImageDao imageDao, CloudinaryFileService cloudinaryFileService, CandidateDao candidateDao) {
+	public ImageManager(ImageDao imageDao, FileService cloudinaryFileService, CandidateDao candidateDao) {
 		super();
 		this.imageDao = imageDao;
 		this.cloudinaryFileService = cloudinaryFileService;
@@ -35,9 +35,9 @@ public class ImageManager implements ImageService{
 	}
 
 	@Override
-	public DataResult<List<Image>> findByCandidate_Id(int candidateId) {
+	public DataResult<List<Image>> findByCandidateId(int candidateId) {
 		
-		return new SuccessDataResult<List<Image>>(this.imageDao.findByCandidate_Id(candidateId), "Data Listelendi");
+		return new SuccessDataResult<List<Image>>(this.imageDao.findByCandidateId(candidateId), "Data Listelendi");
 	}
 
 	@Override
@@ -57,10 +57,24 @@ public class ImageManager implements ImageService{
 		image.setCandidate(this.candidateDao.findById(candidateId).get());
 		image.setImagePath(path);
 		image.setStorageName(StorageType.Cloudinary);
-		image.setImageName(this.candidateDao.findById(candidateId).get().getFirstName() + (new Date()));
+		image.setImageName(this.candidateDao.findById(candidateId).get().getFirstName() + this.candidateDao.findById(candidateId).get().getBirthYear());
 		this.imageDao.save(image);
 		
-		return new SuccessResult("Resim Cloudinary'e yüklendi");
+		return new SuccessResult("Resim Cloudinary'e yüklendi. Linki: " + path);
 	}
+/*
+	@Override
+	public Result add(MultipartFile file, int candidateId) throws IOException {
+		
+		String path= this.cloudinaryFileService.upload(file);
+		//add new image to DB
+		Image image = new Image();
+		image.setCandidate(this.candidateDao.findById(candidateId).get());
+		image.setImagePath(path);
+		image.setStorageName(StorageType.Cloudinary);
+		image.setImageName(this.candidateDao.findById(candidateId).get().getFirstName() + this.candidateDao.findById(candidateId).get().getBirthYear());
+		this.imageDao.save(image);
+		
+		return new SuccessResult("Resim Cloudinary'e yüklendi");	}*/
 
 }

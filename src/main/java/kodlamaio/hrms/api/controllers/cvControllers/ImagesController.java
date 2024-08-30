@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+//import org.springframework.web.multipart.MultipartFile;
 
 import kodlamaio.hrms.business.abstracts.cvServices.ImageService;
 import kodlamaio.hrms.core.utilities.results.DataResult;
@@ -28,10 +29,15 @@ public class ImagesController {
 
 	@GetMapping("/findByCandidateId") 
 	public DataResult<List<Image>> findByCandidateId(@RequestParam int candidateId){
-		return this.imageService.findByCandidate_Id(candidateId);
+		return this.imageService.findByCandidateId(candidateId);
 	}
 	
-	@PostMapping("/add")
+	/*@PostMapping("/addbyfile")
+	public Result add(@RequestParam("file")MultipartFile file, @RequestParam int candidateId) throws IOException{
+		return this.imageService.add(file, candidateId);
+	}*/
+	
+	@PostMapping("/addbypath")
 	public Result add(@RequestParam int candidateId, @RequestParam String filePath) throws IOException{
 		return this.imageService.add(candidateId, filePath);
 	}

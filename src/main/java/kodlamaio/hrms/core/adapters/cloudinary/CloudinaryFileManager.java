@@ -1,17 +1,19 @@
 package kodlamaio.hrms.core.adapters.cloudinary;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 
 @Service
-public class CloudinaryFileManager implements CloudinaryFileService{
+public class CloudinaryFileManager implements FileService{
 
 	private final Cloudinary cloudinary ;
 	
@@ -19,7 +21,7 @@ public class CloudinaryFileManager implements CloudinaryFileService{
 	 public CloudinaryFileManager(Cloudinary cloudinary) {
 	    this.cloudinary = cloudinary;
 	 }
-/*
+
 	 @Override
 	 public String upload(MultipartFile file) throws IOException {
 		 
@@ -38,7 +40,7 @@ public class CloudinaryFileManager implements CloudinaryFileService{
 	        return convFile;
 	    }
 	    
-	    */
+	    
 	    
 		@Override
 		public String upload(File file) throws IOException{
@@ -46,6 +48,8 @@ public class CloudinaryFileManager implements CloudinaryFileService{
 			Map<?,?> uploadResult = cloudinary.uploader().upload(file, ObjectUtils.emptyMap());
 	        return  (uploadResult.get("url").toString());
 		}
+
+
 
 
 }
