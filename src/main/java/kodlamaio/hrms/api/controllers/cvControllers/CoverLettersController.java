@@ -14,6 +14,7 @@ import kodlamaio.hrms.business.abstracts.cvServices.CoverLetterService;
 import kodlamaio.hrms.core.utilities.results.DataResult;
 import kodlamaio.hrms.core.utilities.results.Result;
 import kodlamaio.hrms.entities.concretes.cv.CoverLetter;
+import kodlamaio.hrms.entities.dtos.cv.CoverLetterDto;
 
 @RestController
 @RequestMapping("/api/coverLetters")
@@ -27,8 +28,8 @@ public class CoverLettersController {
 	}
 	
 	@GetMapping("/findByCandidateId") 
-	public DataResult<List<CoverLetter>> findByCandidateId(@RequestParam int candidateId){
-		return this.coverLetterService.listCoverLetterOfCandidate(candidateId);
+	public DataResult<List<CoverLetterDto>> findByCandidateId(@RequestParam int candidateId){
+		return this.coverLetterService.listCoverLetterDtosOfCandidate(candidateId);
 	}
 
 	@PostMapping("/add")

@@ -14,6 +14,7 @@ import kodlamaio.hrms.business.abstracts.cvServices.LanguageInformationService;
 import kodlamaio.hrms.core.utilities.results.DataResult;
 import kodlamaio.hrms.core.utilities.results.Result;
 import kodlamaio.hrms.entities.concretes.cv.LanguageInformation;
+import kodlamaio.hrms.entities.dtos.cv.LanguageInformationDto;
 
 @RestController
 @RequestMapping("/api/languageInformations")
@@ -28,8 +29,8 @@ public class LanguageInformationsController {
 	}
 	
 	@GetMapping("/findByCandidate")
-	public DataResult<List<LanguageInformation>> findByCandidateId(@RequestParam int candidateId){
-		return this.languageInformationService.listLanguageInformationOfCandidate(candidateId);
+	public DataResult<List<LanguageInformationDto>> findByCandidateId(@RequestParam int candidateId){
+		return this.languageInformationService.listLanguageInformationDtosOfCandidate(candidateId);
 	}
 
 	@PostMapping("/add")

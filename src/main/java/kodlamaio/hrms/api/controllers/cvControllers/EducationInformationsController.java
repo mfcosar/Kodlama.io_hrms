@@ -14,6 +14,7 @@ import kodlamaio.hrms.business.abstracts.cvServices.EducationInformationService;
 import kodlamaio.hrms.core.utilities.results.DataResult;
 import kodlamaio.hrms.core.utilities.results.Result;
 import kodlamaio.hrms.entities.concretes.cv.EducationInformation;
+import kodlamaio.hrms.entities.dtos.cv.EducationInformationDto;
 
 @RestController
 @RequestMapping("/api/educationInformations")
@@ -28,8 +29,8 @@ public class EducationInformationsController {
 	}
 	
 	@GetMapping("/findByCandidateId") 
-	public DataResult<List<EducationInformation>> findByCandidateId(@RequestParam int candidateId){
-		return this.educationInformationService.listEducationInformationOfCandidate(candidateId);
+	public DataResult<List<EducationInformationDto>> findByCandidateId(@RequestParam int candidateId){
+		return this.educationInformationService.listEducationInformationDtoOfCandidate(candidateId);
 	}
 
 	@PostMapping("/add")

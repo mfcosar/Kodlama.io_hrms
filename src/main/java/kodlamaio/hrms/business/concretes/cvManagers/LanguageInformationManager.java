@@ -12,6 +12,7 @@ import kodlamaio.hrms.core.utilities.results.SuccessDataResult;
 import kodlamaio.hrms.core.utilities.results.SuccessResult;
 import kodlamaio.hrms.dataAccess.abstracts.cvDaos.LanguageInformationDao;
 import kodlamaio.hrms.entities.concretes.cv.LanguageInformation;
+import kodlamaio.hrms.entities.dtos.cv.LanguageInformationDto;
 
 @Service
 public class LanguageInformationManager implements LanguageInformationService{
@@ -29,12 +30,17 @@ public class LanguageInformationManager implements LanguageInformationService{
 		this.languageInformationDao.save(languageInformation);
 		return new SuccessResult("Yabancı dil bilgisi eklendi.");
 	}
-
 	@Override
-	public DataResult<List<LanguageInformation>> listLanguageInformationOfCandidate(int candidateId) {
-		
-		return new SuccessDataResult<List<LanguageInformation>>(this.languageInformationDao.findByCandidateId(candidateId), 
+	public DataResult<List<LanguageInformationDto>> listLanguageInformationDtosOfCandidate(int candidateId) {
+		return new SuccessDataResult<List<LanguageInformationDto>>(this.languageInformationDao.findLanguageInformationDtoByCandidateId(candidateId), 
 				"Yabancı dil bilgisi listelendi");
 	}
+
+	/*@Override
+	public DataResult<List<LanguageInformation>> listLanguageInformationOfCandidate(int candidateId) {
+		return new SuccessDataResult<List<LanguageInformation>>(this.languageInformationDao.findByCandidateId(candidateId), 
+				"Yabancı dil bilgisi listelendi");
+	}*/
+
 
 }

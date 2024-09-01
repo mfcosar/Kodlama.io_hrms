@@ -14,6 +14,7 @@ import kodlamaio.hrms.business.abstracts.cvServices.WebAddressService;
 import kodlamaio.hrms.core.utilities.results.DataResult;
 import kodlamaio.hrms.core.utilities.results.Result;
 import kodlamaio.hrms.entities.concretes.cv.WebAddress;
+import kodlamaio.hrms.entities.dtos.cv.WebAddressDto;
 
 @RestController
 @RequestMapping("/api/webAddresses")
@@ -28,8 +29,8 @@ public class WebAddressesController {
 	}
 	
 	@GetMapping("/findByCandidateId") 
-	public DataResult<List<WebAddress>> findByCandidateId(@RequestParam int candidateId){
-		return this.webAddressService.listWebAddressOfCandidate(candidateId);
+	public DataResult<List<WebAddressDto>> findByCandidateId(@RequestParam int candidateId){
+		return this.webAddressService.listWebAddressDtoOfCandidate(candidateId);
 	}
 
 	@PostMapping("/add")

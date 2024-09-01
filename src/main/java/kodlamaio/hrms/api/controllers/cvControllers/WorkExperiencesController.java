@@ -14,6 +14,7 @@ import kodlamaio.hrms.business.abstracts.cvServices.WorkExperienceService;
 import kodlamaio.hrms.core.utilities.results.DataResult;
 import kodlamaio.hrms.core.utilities.results.Result;
 import kodlamaio.hrms.entities.concretes.cv.WorkExperience;
+import kodlamaio.hrms.entities.dtos.cv.WorkExperienceDto;
 
 @RestController
 @RequestMapping("/api/workExperiences")
@@ -28,8 +29,8 @@ public class WorkExperiencesController {
 	}
 	
 	@GetMapping("/findByCandidateId") 
-	public DataResult<List<WorkExperience>> findByCandidateId(@RequestParam int candidateId){
-		return this.workExperienceService.listWorkExperienceOfCandidate(candidateId);
+	public DataResult<List<WorkExperienceDto>> findByCandidateId(@RequestParam int candidateId){
+		return this.workExperienceService.listWorkExperienceDtosOfCandidate(candidateId);
 	}
 
 	@PostMapping("/add")

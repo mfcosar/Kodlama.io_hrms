@@ -18,6 +18,7 @@ import kodlamaio.hrms.dataAccess.abstracts.CandidateDao;
 import kodlamaio.hrms.dataAccess.abstracts.cvDaos.ImageDao;
 import kodlamaio.hrms.entities.concretes.cv.Image;
 import kodlamaio.hrms.entities.concretes.cv.enums.StorageType;
+import kodlamaio.hrms.entities.dtos.cv.ImageDto;
 
 @Service
 public class ImageManager implements ImageService{
@@ -32,12 +33,6 @@ public class ImageManager implements ImageService{
 		this.imageDao = imageDao;
 		this.cloudinaryFileService = cloudinaryFileService;
 		this.candidateDao= candidateDao;
-	}
-
-	@Override
-	public DataResult<List<Image>> findByCandidateId(int candidateId) {
-		
-		return new SuccessDataResult<List<Image>>(this.imageDao.findByCandidateId(candidateId), "Data Listelendi");
 	}
 
 	@Override
@@ -62,8 +57,11 @@ public class ImageManager implements ImageService{
 		
 		return new SuccessResult("Resim Cloudinary'e yüklendi. Linki: " + path);
 	}
-/*
 	@Override
+	public DataResult<List<ImageDto>> findImageDtosByCandidateId(int candidateId) {
+		return new SuccessDataResult<List<ImageDto>>(this.imageDao.findImageDtosByCandidateId(candidateId), "Data Listelendi");
+	}
+/*	@Override
 	public Result add(MultipartFile file, int candidateId) throws IOException {
 		
 		String path= this.cloudinaryFileService.upload(file);
@@ -77,4 +75,11 @@ public class ImageManager implements ImageService{
 		
 		return new SuccessResult("Resim Cloudinary'e yüklendi");	}*/
 
+	
+
+	/*@Override
+	public DataResult<List<Image>> findByCandidateId(int candidateId) {
+		
+		return new SuccessDataResult<List<Image>>(this.imageDao.findByCandidateId(candidateId), "Data Listelendi");
+	}*/
 }

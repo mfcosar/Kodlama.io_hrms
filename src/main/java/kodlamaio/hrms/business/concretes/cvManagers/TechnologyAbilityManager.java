@@ -12,6 +12,7 @@ import kodlamaio.hrms.core.utilities.results.SuccessDataResult;
 import kodlamaio.hrms.core.utilities.results.SuccessResult;
 import kodlamaio.hrms.dataAccess.abstracts.cvDaos.TechnologyAbilityDao;
 import kodlamaio.hrms.entities.concretes.cv.TechnologyAbility;
+import kodlamaio.hrms.entities.dtos.cv.TechnologyAbilityDto;
 
 @Service
 public class TechnologyAbilityManager implements TechnologyAbilityService{
@@ -31,10 +32,14 @@ public class TechnologyAbilityManager implements TechnologyAbilityService{
 	}
 
 	@Override
-	public DataResult<List<TechnologyAbility>> listTechnologyAbilityOfCandidate(int candidateId) {
-		
-		return new SuccessDataResult<List<TechnologyAbility>>(this.technologyAbilityDao.findByCandidateId(candidateId), 
+	public DataResult<List<TechnologyAbilityDto>> listTechnologyAbilityDtosOfCandidate(int candidateId) {
+		return new SuccessDataResult<List<TechnologyAbilityDto>>(this.technologyAbilityDao.findTechnologyAbilityDtosByCandidateId(candidateId), 
 				"Adaya ait teknoloji bilgileri listelendi");
 	}
+	/*@Override
+	public DataResult<List<TechnologyAbility>> listTechnologyAbilityOfCandidate(int candidateId) {
+		return new SuccessDataResult<List<TechnologyAbility>>(this.technologyAbilityDao.findByCandidateId(candidateId), 
+				"Adaya ait teknoloji bilgileri listelendi");
+	}*/
 
 }

@@ -53,23 +53,33 @@ public class CandidateCvManager implements CandidateCvService{
 		cvList.add("Adayın kimlik bilgileri:");
 		cvList.add(this.candidateDao.findById(candidateId));
 		cvList.add("Adayın eğitim bilgileri:");
-		cvList.add(this.educationInformationDao.findByCandidateIdAndIsGraduateFalse(candidateId));
-		cvList.add(this.educationInformationDao.findByCandidateIdOrderByEndDateDesc(candidateId));
+		cvList.add(this.educationInformationDao.findEducationInformationDtoByCandidateIdAndIsGraduateFalse(candidateId));
+		cvList.add(this.educationInformationDao.findEducationInformationDtoByCandidateIdOrderByEndDateDesc(candidateId));
 		cvList.add("Adayın iş tecrübesi bilgileri:");
-		cvList.add(this.workExperienceDao.findByCandidateIdAndIsContinuedTrue(candidateId));
-		cvList.add(this.workExperienceDao.findByCandidateIdOrderByEndDateDesc(candidateId));
+		cvList.add(this.workExperienceDao.findWorkExperienceDtoByCandidateIdAndIsContinuedTrue(candidateId));
+		cvList.add(this.workExperienceDao.findWorkExperienceDtoByCandidateIdOrderByEndDateDesc(candidateId));
 		cvList.add("Adayın yabancı dil bilgileri:");
-		cvList.add(this.languageInformationDao.findByCandidateId(candidateId));
+		cvList.add(this.languageInformationDao.findLanguageInformationDtoByCandidateId(candidateId));
 		cvList.add("Adayın fotoğraf bilgileri:");
-		cvList.add(this.imageDao.findByCandidateId(candidateId));	
+		cvList.add(this.imageDao.findImageDtosByCandidateId(candidateId));
 		cvList.add("Adayın web hesap bilgileri:");
-		cvList.add(this.webAddressDao.findByCandidateId(candidateId));
+		cvList.add(this.webAddressDao.findWebAddressDtoByCandidateId(candidateId));
 		cvList.add("Adayın teknoloji bilgileri:");
-		cvList.add(this.technologyAbilityDao.findByCandidateId(candidateId));
+		cvList.add(this.technologyAbilityDao.findTechnologyAbilityDtosByCandidateId(candidateId));
 		cvList.add("Adayın ön yazısı:");
-		cvList.add(this.coverLetterDao.findByCandidateId(candidateId));
+		cvList.add(this.coverLetterDao.findCoverLetterDtosByCandidateId(candidateId));
 		
 		return new SuccessDataResult<List<Object>> (cvList, "Adayın Cv bilgileri listelendi");
+		
+		/*cvList.add(this.educationInformationDao.findByCandidateIdAndIsGraduateFalse(candidateId));
+		cvList.add(this.educationInformationDao.findByCandidateIdOrderByEndDateDesc(candidateId));
+		cvList.add(this.workExperienceDao.findByCandidateIdAndIsContinuedTrue(candidateId));
+		cvList.add(this.workExperienceDao.findByCandidateIdOrderByEndDateDesc(candidateId));
+		cvList.add(this.languageInformationDao.findByCandidateId(candidateId));
+		cvList.add(this.imageDao.findByCandidateId(candidateId));
+		cvList.add(this.webAddressDao.findByCandidateId(candidateId));	
+		cvList.add(this.technologyAbilityDao.findByCandidateId(candidateId));
+		cvList.add(this.coverLetterDao.findByCandidateId(candidateId));*/
 	}
 
 }

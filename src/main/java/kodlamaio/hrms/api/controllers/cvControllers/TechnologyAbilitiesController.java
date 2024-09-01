@@ -14,6 +14,7 @@ import kodlamaio.hrms.business.abstracts.cvServices.TechnologyAbilityService;
 import kodlamaio.hrms.core.utilities.results.DataResult;
 import kodlamaio.hrms.core.utilities.results.Result;
 import kodlamaio.hrms.entities.concretes.cv.TechnologyAbility;
+import kodlamaio.hrms.entities.dtos.cv.TechnologyAbilityDto;
 
 @RestController
 @RequestMapping("/api/technologyAbilities")
@@ -27,8 +28,8 @@ public class TechnologyAbilitiesController {
 	}
 
 	@GetMapping("/findByCandidateId") 
-	public DataResult<List<TechnologyAbility>> findByCandidateId(@RequestParam int candidateId){
-		return this.technologyAbilityService.listTechnologyAbilityOfCandidate(candidateId);
+	public DataResult<List<TechnologyAbilityDto>> findByCandidateId(@RequestParam int candidateId){
+		return this.technologyAbilityService.listTechnologyAbilityDtosOfCandidate(candidateId);
 	}
 
 	@PostMapping("/add")

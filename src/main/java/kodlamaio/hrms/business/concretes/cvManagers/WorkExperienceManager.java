@@ -12,6 +12,7 @@ import kodlamaio.hrms.core.utilities.results.SuccessDataResult;
 import kodlamaio.hrms.core.utilities.results.SuccessResult;
 import kodlamaio.hrms.dataAccess.abstracts.cvDaos.WorkExperienceDao;
 import kodlamaio.hrms.entities.concretes.cv.WorkExperience;
+import kodlamaio.hrms.entities.dtos.cv.WorkExperienceDto;
 
 @Service
 public class WorkExperienceManager implements WorkExperienceService{
@@ -31,12 +32,20 @@ public class WorkExperienceManager implements WorkExperienceService{
 	}
 
 	@Override
+	public DataResult<List<WorkExperienceDto>> listWorkExperienceDtosOfCandidate(int candidateId) {
+		//hala devam eden iş en üstte
+		List<WorkExperienceDto> listWorkExp = this.workExperienceDao.findWorkExperienceDtoByCandidateIdAndIsContinuedTrue(candidateId);
+		
+		listWorkExp.addAll(this.workExperienceDao.findWorkExperienceDtoByCandidateIdOrderByEndDateDesc(candidateId));
+		return new SuccessDataResult<List<WorkExperienceDto>>(listWorkExp,  "İş deneyimleri çıkış tarihine göre dizilip listelendi.");
+	}
+
+	/*@Override
 	public DataResult<List<WorkExperience>> listWorkExperienceOfCandidate(int candidateId) {
 		//hala devam eden iş en üstte
 		List<WorkExperience> listWorkExp = this.workExperienceDao.findByCandidateIdAndIsContinuedTrue(candidateId);
 		
 		listWorkExp.addAll(this.workExperienceDao.findByCandidateIdOrderByEndDateDesc(candidateId));
 		return new SuccessDataResult<List<WorkExperience>>(listWorkExp,  "İş deneyimleri çıkış tarihine göre dizilip listelendi.");
-	}
-
+	}*/
 }

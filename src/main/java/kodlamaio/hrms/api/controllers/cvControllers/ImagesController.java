@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import kodlamaio.hrms.business.abstracts.cvServices.ImageService;
 import kodlamaio.hrms.core.utilities.results.DataResult;
 import kodlamaio.hrms.core.utilities.results.Result;
-import kodlamaio.hrms.entities.concretes.cv.Image;
+import kodlamaio.hrms.entities.dtos.cv.ImageDto;
 
 @RestController
 @RequestMapping("/api/images")
@@ -28,8 +28,8 @@ public class ImagesController {
 	}
 
 	@GetMapping("/findByCandidateId") 
-	public DataResult<List<Image>> findByCandidateId(@RequestParam int candidateId){
-		return this.imageService.findByCandidateId(candidateId);
+	public DataResult<List<ImageDto>> findByCandidateId(@RequestParam int candidateId){
+		return this.imageService.findImageDtosByCandidateId(candidateId);
 	}
 	
 	/*@PostMapping("/addbyfile")

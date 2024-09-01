@@ -12,6 +12,7 @@ import kodlamaio.hrms.core.utilities.results.SuccessDataResult;
 import kodlamaio.hrms.core.utilities.results.SuccessResult;
 import kodlamaio.hrms.dataAccess.abstracts.cvDaos.WebAddressDao;
 import kodlamaio.hrms.entities.concretes.cv.WebAddress;
+import kodlamaio.hrms.entities.dtos.cv.WebAddressDto;
 
 @Service
 public class WebAddressManager implements WebAddressService{
@@ -22,11 +23,6 @@ public class WebAddressManager implements WebAddressService{
 		super();
 		this.webAddressDao = webAddressDao;
 	}
-	
-	@Override
-	public DataResult<List<WebAddress>> listWebAddressOfCandidate(int candidateId) {
-		return new SuccessDataResult<List<WebAddress>>(this.webAddressDao.findByCandidateId(candidateId), "Adaya ait web hesap bilgileri listelendi");
-	}
 
 	@Override
 	public Result add(WebAddress webAddress) {
@@ -34,4 +30,13 @@ public class WebAddressManager implements WebAddressService{
 		return new SuccessResult("Web adres bilgileri eklendi.");
 	}
 
+	@Override
+	public DataResult<List<WebAddressDto>> listWebAddressDtoOfCandidate(int candidateId) {
+		return new SuccessDataResult<List<WebAddressDto>>(this.webAddressDao.findWebAddressDtoByCandidateId(candidateId), "Adaya ait web hesap bilgileri listelendi");
+	}
+	
+	/*@Override
+	public DataResult<List<WebAddress>> listWebAddressOfCandidate(int candidateId) {
+		return new SuccessDataResult<List<WebAddress>>(this.webAddressDao.findByCandidateId(candidateId), "Adaya ait web hesap bilgileri listelendi");
+	}*/
 }
