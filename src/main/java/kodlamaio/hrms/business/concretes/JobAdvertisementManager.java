@@ -12,6 +12,7 @@ import kodlamaio.hrms.core.utilities.results.SuccessDataResult;
 import kodlamaio.hrms.core.utilities.results.SuccessResult;
 import kodlamaio.hrms.dataAccess.abstracts.JobAdvertisementDao;
 import kodlamaio.hrms.entities.concretes.JobAdvertisement;
+import kodlamaio.hrms.entities.dtos.JobAdvertisementDto;
 
 @Service
 public class JobAdvertisementManager implements JobAdvertisementService{
@@ -36,26 +37,6 @@ public class JobAdvertisementManager implements JobAdvertisementService{
 	}
 
 	@Override
-	public DataResult<List<JobAdvertisement>> findByIsActiveTrue() {
-		return new SuccessDataResult<List<JobAdvertisement>>(this.jobAdvertisementDao.findByIsActiveTrue(), "Tüm aktif iş ilanları listelendi");
-	}
-
-	@Override
-	public DataResult<List<JobAdvertisement>> findByIsActiveTrueOrderByPublicationDateAsc() {
-		return new SuccessDataResult<List<JobAdvertisement>>(this.jobAdvertisementDao.findByIsActiveTrueOrderByPublicationDateAsc(), "Tüm aktif iş ilanları yayınlanma tarihine göre dizilip listelendi.");
-	}
-
-	@Override
-	public DataResult<List<JobAdvertisement>> findByEmployer_IdAndIsActiveTrue(int employerId) {
-		return new SuccessDataResult<List<JobAdvertisement>>(this.jobAdvertisementDao.findByEmployer_IdAndIsActiveTrue(employerId), "Firmaya ait tüm aktif iş ilanları listelendi.");
-	}
-
-	@Override
-	public DataResult<List<JobAdvertisement>> findByEmployer_CompanyNameAndIsActiveTrue(String companyName) {
-		return new SuccessDataResult<List<JobAdvertisement>>(this.jobAdvertisementDao.findByEmployer_CompanyNameAndIsActiveTrue(companyName), "Firmaya ait tüm aktif iş ilanları listelendi.");
-	}
-
-	@Override
 	public DataResult<JobAdvertisement> deactiveJobAdvertisement(int jobAdvertisementId) {
 		
 		JobAdvertisement ja = this.jobAdvertisementDao.findById(jobAdvertisementId);
@@ -63,5 +44,33 @@ public class JobAdvertisementManager implements JobAdvertisementService{
 		this.jobAdvertisementDao.save(ja); //Db'nin save etmesi gerek
 		return new SuccessDataResult<JobAdvertisement>(this.jobAdvertisementDao.findById(jobAdvertisementId), jobAdvertisementId+ " : Nolu iş ilanı pasifleştirildi");
 	}
+
+	@Override
+	public DataResult<List<JobAdvertisementDto>> findJobAdvertisementDtosActive() {
+		return new SuccessDataResult<List<JobAdvertisementDto>>(this.jobAdvertisementDao.findJobAdvertisementDtosActive(), "Tüm aktif iş ilanları listelendi");
+	}
+
+	@Override
+	public DataResult<List<JobAdvertisementDto>> findJobAdvertisementDtosActiveOrderByPublicationDateAsc() {
+
+		return new SuccessDataResult<List<JobAdvertisementDto>>(this.jobAdvertisementDao.findJobAdvertisementDtosActiveOrderByPublicationDateAsc(), "Tüm aktif iş ilanları yayınlanma tarihine göre dizilip listelendi.");
+	}
+
+	@Override
+	public DataResult<List<JobAdvertisementDto>> findJobAdvertisementDtosByEmployerIdAndActive(int employerId) {
+		return new SuccessDataResult<List<JobAdvertisementDto>>(this.jobAdvertisementDao.findJobAdvertisementDtosByEmployerIdAndActive(employerId), "Firmaya ait tüm aktif iş ilanları listelendi.");
+	}
+
+	@Override
+	public DataResult<List<JobAdvertisementDto>> findJobAdvertisementDtosByEmployerCompanyNameAndActive(String companyName) {
+		return new SuccessDataResult<List<JobAdvertisementDto>>(this.jobAdvertisementDao.findJobAdvertisementDtosByEmployerCompanyNameAndActive(companyName), "Firmaya ait tüm aktif iş ilanları listelendi.");
+	}
+
+	@Override
+	public DataResult<List<JobAdvertisementDto>> getAllJobAdvertisementDtos() {
+		return new SuccessDataResult<List<JobAdvertisementDto>>(this.jobAdvertisementDao.getAllJobAdvertisementDtos(), "Sistemdeki tüm iş ilanları listelendi");
+	}
+
+	
 
 }

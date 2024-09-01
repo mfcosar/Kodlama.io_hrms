@@ -14,6 +14,7 @@ import kodlamaio.hrms.business.abstracts.JobAdvertisementService;
 import kodlamaio.hrms.core.utilities.results.DataResult;
 import kodlamaio.hrms.core.utilities.results.Result;
 import kodlamaio.hrms.entities.concretes.JobAdvertisement;
+import kodlamaio.hrms.entities.dtos.JobAdvertisementDto;
 
 @RestController
 @RequestMapping("/api/jobAdvertisements")
@@ -40,33 +41,39 @@ public class JobAdvertisementsController {
 
 	
 	@GetMapping("/getallactive") 
-	public DataResult<List<JobAdvertisement>> getAllActiveAdvertisements(){
+	public DataResult<List<JobAdvertisementDto>> getAllActiveAdvertisements(){
 		
-		return this.jobAdvertisementService.findByIsActiveTrue();
+		return this.jobAdvertisementService.findJobAdvertisementDtosActive();
 	}
 	
 	@GetMapping("/getallactiveorderbypublicationdate") 
-	public DataResult<List<JobAdvertisement>> findByIsActiveTrueOrderByPublicationDateAsc(){
+	public DataResult<List<JobAdvertisementDto>> findByIsActiveTrueOrderByPublicationDateAsc(){
 		
-		return this.jobAdvertisementService.findByIsActiveTrueOrderByPublicationDateAsc();
+		return this.jobAdvertisementService.findJobAdvertisementDtosActiveOrderByPublicationDateAsc();
 	}
 	
 	@GetMapping("/getallactiveofacompanybyid") 
-	public DataResult<List<JobAdvertisement>> findByEmployer_IdAndIsActiveTrue(@RequestParam int employerId){
+	public DataResult<List<JobAdvertisementDto>> findByEmployer_IdAndIsActiveTrue(@RequestParam int employerId){
 		
-		return this.jobAdvertisementService.findByEmployer_IdAndIsActiveTrue(employerId);
+		return this.jobAdvertisementService.findJobAdvertisementDtosByEmployerIdAndActive(employerId);
 	}
 	
 	@GetMapping("/getallactiveofacompanybycompanyname") 
-	public DataResult<List<JobAdvertisement>> findByEmployer_CompanyNameAndIsActiveTrue(@RequestParam String companyName){
+	public DataResult<List<JobAdvertisementDto>> findByEmployerCompanyNameAndActive(@RequestParam String companyName){
 		
-		return this.jobAdvertisementService.findByEmployer_CompanyNameAndIsActiveTrue(companyName);
+		return this.jobAdvertisementService.findJobAdvertisementDtosByEmployerCompanyNameAndActive(companyName);
 	}
 	
 	@GetMapping("/deactivatebyid") 
 	public DataResult<JobAdvertisement> deactiveJobAdvertisement(@RequestParam int jobAdvertisementId){
 		
 		return this.jobAdvertisementService.deactiveJobAdvertisement(jobAdvertisementId);
+	}
+	
+	@GetMapping("/getalldtos") 
+	public DataResult<List<JobAdvertisementDto>> getAllDtos(){
+		
+		return this.jobAdvertisementService.getAllJobAdvertisementDtos();
 	}
 	
 }
