@@ -33,7 +33,7 @@ public class CandidateManager implements CandidateService{
 
 	@Override
 	public DataResult<List<Candidate>> getAll() {
-		// TODO Auto-generated method stub
+
 		return new SuccessDataResult<List<Candidate>>(this.candidateDao.findAll(), "Data Listelendi");
 	}
 
@@ -55,6 +55,11 @@ public class CandidateManager implements CandidateService{
 		}
 		else return new ErrorResult("Aday eklenemedi");
 
+	}
+
+	@Override
+	public DataResult<Candidate> findCandidateById(int candidateId) {
+		return new SuccessDataResult<Candidate>(this.candidateDao.findCandidateById(candidateId), "Ada bilgisi listelendi");
 	}
 	
 }

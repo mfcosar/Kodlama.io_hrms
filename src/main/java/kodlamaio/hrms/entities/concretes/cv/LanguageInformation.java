@@ -27,7 +27,7 @@ public class LanguageInformation {
 	
 	@ManyToOne()
 	@JoinColumn(name="candidate_id")
-	Candidate candidate; 	//private int candidateId;
+	private Candidate candidate; 	//private int candidateId;
 	
 	@Column(name="foreign_language_name")
 	private String foreignLanguageName;

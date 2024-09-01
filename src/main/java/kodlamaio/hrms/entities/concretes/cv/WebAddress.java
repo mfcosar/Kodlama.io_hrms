@@ -27,7 +27,7 @@ public class WebAddress {
 	
 	@OneToOne()
 	@JoinColumn(name="candidate_id")
-	Candidate candidate;	//private int candidateId;
+	private Candidate candidate;	//private int candidateId;
 	
 	@Column(name="github_address")
 	private String githubAddress;

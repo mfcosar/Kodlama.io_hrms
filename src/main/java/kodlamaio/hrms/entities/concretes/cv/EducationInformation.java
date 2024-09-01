@@ -30,7 +30,7 @@ public class EducationInformation {
 	
 	@ManyToOne()
 	@JoinColumn(name="candidate_id")
-	Candidate candidate;  	//private int candidateId;
+	private Candidate candidate;  	//private int candidateId;
 
 	@Column(name="school_name")
 	private String schoolName;

@@ -28,7 +28,7 @@ public class CoverLetter {
 	
 	@OneToOne()
 	@JoinColumn(name="candidate_id")
-	Candidate candidate;	//private int candidateId;
+	private Candidate candidate;	//private int candidateId;
 	
 	@Column(name="cover_letter_details")
 	private String coverLetterDetails;

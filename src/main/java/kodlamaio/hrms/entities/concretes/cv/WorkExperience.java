@@ -29,7 +29,7 @@ public class WorkExperience {
 	
 	@ManyToOne()
 	@JoinColumn(name="candidate_id")
-	Candidate candidate;    //private int candidateId;
+	private Candidate candidate;    //private int candidateId;
 	
 	@Column(name="company_name")
 	private String companyName;

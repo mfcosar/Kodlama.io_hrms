@@ -29,7 +29,7 @@ public class Image {
 	
 	@ManyToOne()
 	@JoinColumn(name="candidate_id")
-	Candidate candidate; 	//private int candidateId;
+	private Candidate candidate; 	//private int candidateId;
 	
 	@Column(name="image_path")
 	private String imagePath;

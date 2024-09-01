@@ -26,7 +26,7 @@ public class TechnologyAbility {
 	
 	@ManyToOne()
 	@JoinColumn(name="candidate_id")
-	Candidate candidate;	//private int candidateId;
+	private Candidate candidate;	//private int candidateId;
 	
 	@Column(name="technology_name")
 	private String technologyName;
