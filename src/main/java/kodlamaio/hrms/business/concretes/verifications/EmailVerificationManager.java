@@ -2,6 +2,7 @@ package kodlamaio.hrms.business.concretes.verifications;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,26 +51,28 @@ public class EmailVerificationManager implements EmailVerificationService{
 
 	
 	@Override
-	public Result generateVerificationEmailForCandidate(Candidate candidate) {
+	public Result  generateVerificationEmailForCandidate(Candidate candidate) {//daha DB'e kaydedilmedi: Result
 		
-		EmailVerification emailVerification = generateNewEmailVerificationCode();
+		/*CandidateEmailVerification candidateEmailVerification = new CandidateEmailVerification();
+		candidateEmailVerification.setCode(generateNewEmailVerificationCode()+candidate.getEmail());
+		candidateEmailVerification.setVerified(false);
+		this.candidateEmailVerificationDao.save(candidateEmailVerification);*/
+		
+		EmailVerification emailVerification = new EmailVerification();
+		emailVerification.setCode(generateNewEmailVerificationCode()+candidate.getEmail());
+		emailVerification.setVerified(false);
 		this.emailVerificationDao.save(emailVerification);
-		
-		CandidateEmailVerification candidateEmailVerification = new CandidateEmailVerification();
-		candidateEmailVerification.setId(emailVerification.getId());
-		candidateEmailVerification.setCandidateId(candidate.getId());
-		this.candidateEmailVerificationDao.save(candidateEmailVerification);
 		
 		sendVerificationEmail(candidate);
 		
-		return new SuccessResult("Adaya doğrulama kodu gönderildi.");
+		return new SuccessResult("Adaya doğrulama kodu gönderildi."); //candidateEmailVerification.getId();//
 	}
 	
-	private  EmailVerification generateNewEmailVerificationCode() {
+	private String generateNewEmailVerificationCode() {
 		// new email verification 
-		EmailVerification emailVerification = new EmailVerification();
-		emailVerification.setCode("generateRandomCodeHere0123456789" + new Date().hashCode());
-		return emailVerification;
+		//String code = "generateRandomCodeHere0123456789" + new Date().hashCode(); //burası random string olacak ama biz simulasyon için sabit kullanıyoruz
+		String code = "generateRandomCodeHere0123456789" ;
+		return code;
 	}
 	
 	private Result sendVerificationEmail(User user) {
@@ -78,9 +81,49 @@ public class EmailVerificationManager implements EmailVerificationService{
 	}
 
 	@Override
+	public Result setCandidateVerificationCompleted(String code) {
+		int emailVerificationId=0;
+
+		for (EmailVerification x: this.emailVerificationDao.findAll()) {
+			if (x.getCode().equals(code)) //en az 8 saattir burdaki string comparisonu == ile yapmaya çalıştığım için hatayı bulamadım.4.9.2024 2:09
+				emailVerificationId = x.getId();
+		}
+		
+		EmailVerification emailVerification = this.emailVerificationDao.getReferenceById(emailVerificationId);//getById ==> deprecated
+		emailVerification.setVerified(true);
+		emailVerification.setVerificationDate(new Date());
+		
+		/*CandidateEmailVerification candidateEmailVerification = new CandidateEmailVerification();
+		candidateEmailVerification.setId(emailVerificationId);*/
+		
+		/*CandidateEmailVerification candidateEmailVerification = this.candidateEmailVerificationDao.getReferenceById(emailVerificationId); //getById ==> deprecated
+		candidateEmailVerification.setVerified(true);
+		candidateEmailVerification.setVerificationDate(new Date());*/
+		this.emailVerificationDao.save(emailVerification); //emailVerification
+		
+		return new SuccessResult("Email doğrulaması tamamlandı.");
+	}
+	
+	@Override
+	public Result checkCandidateEmailVerification(String code) { //int candidateId
+		int id;
+		for (EmailVerification x: this.emailVerificationDao.findAll()){
+			if (x.getCode() == code) {	
+				id = x.getId();
+				if (this.emailVerificationDao.getReferenceById(id).isVerified())
+					return new SuccessResult("Bu kullanıcının email doğrulaması yapılmış.");
+			}
+		}
+
+		return new ErrorResult("Bu kullanıcının email doğrulaması henüz yapılmamış.");
+	}
+	
+	@Override
 	public Result generateVerificationEmailForEmployer(Employer employer) {
 		
-		EmailVerification emailVerification = generateNewEmailVerificationCode();
+		EmailVerification emailVerification = new EmailVerification();
+		emailVerification.setCode(generateNewEmailVerificationCode());
+		emailVerification.setVerified(false);
 		this.emailVerificationDao.save(emailVerification);
 		
 		EmployerEmailVerification employerEmailVerification = new EmployerEmailVerification();
@@ -94,7 +137,8 @@ public class EmailVerificationManager implements EmailVerificationService{
 	}
 
 
-	@Override
+
+/*	@Override
 	public Result setCandidateVerificationCompleted(int candidateId) {
 		
 		int emailVerificationId = 0;
@@ -108,8 +152,10 @@ public class EmailVerificationManager implements EmailVerificationService{
 		emailVerification.setVerified(true);
 		emailVerification.setVerificationDate(new Date());
 		this.emailVerificationDao.save(emailVerification);
+		
 		return new SuccessResult("Email doğrulaması tamamlandı.");
-	}
+	}*/
+
 
 	@Override
 	public Result setEmployerVerificationCompleted(int employerId) {
@@ -130,19 +176,6 @@ public class EmailVerificationManager implements EmailVerificationService{
 
 
 
-	@Override
-	public Result checkCandidateEmailVerification(int candidateId) {
-		int id;
-		for (CandidateEmailVerification x: this.candidateEmailVerificationDao.findAll()){
-			if (x.getCandidateId() == candidateId) {	
-				id = x.getId();
-				if (this.emailVerificationDao.getReferenceById(id).isVerified())
-					return new SuccessResult("Bu kullanıcının email doğrulaması yapılmış.");
-			}
-		}
-
-		return new ErrorResult("Bu kullanıcının email doğrulaması henüz yapılmamış.");
-	}
 
 
 

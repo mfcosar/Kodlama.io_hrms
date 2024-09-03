@@ -14,6 +14,7 @@ import kodlamaio.hrms.core.utilities.results.Result;
 import kodlamaio.hrms.core.utilities.results.SuccessDataResult;
 import kodlamaio.hrms.core.utilities.results.SuccessResult;
 import kodlamaio.hrms.dataAccess.abstracts.CandidateDao;
+import kodlamaio.hrms.dataAccess.abstracts.UserDao;
 import kodlamaio.hrms.entities.concretes.Candidate;
 
 @Service
@@ -22,13 +23,15 @@ public class CandidateManager implements CandidateService{
 	private CandidateDao candidateDao;
 	private CandidateInfoCheckService candidateInfoCheckService;
 	private EmailVerificationService emailVerificationService;
+	private UserDao userDao;
 
 	@Autowired
-	public CandidateManager(CandidateDao candidateDao, CandidateInfoCheckService candidateInfoCheckService, EmailVerificationService emailVerificationService) {
+	public CandidateManager(CandidateDao candidateDao, UserDao userDao, CandidateInfoCheckService candidateInfoCheckService, EmailVerificationService emailVerificationService) {
 		super();
 		this.candidateDao = candidateDao;
 		this.candidateInfoCheckService = candidateInfoCheckService;
 		this.emailVerificationService = emailVerificationService;
+		this.userDao = userDao;
 	}
 
 	@Override
@@ -44,14 +47,22 @@ public class CandidateManager implements CandidateService{
 			
 			this.emailVerificationService.generateVerificationEmailForCandidate(candidate);
 			
-			// Burada aday email doğrulaması yaptı. 
-			this.emailVerificationService.setCandidateVerificationCompleted(candidate.getId());
+			// Burada aday email doğrulaması yaptı, emailinede gelen linke tıkladı, linkteki random string alındı 
+			//simulasyon:						
+			String verificationCode = "generateRandomCodeHere0123456789" + candidate.getEmail();
 			
-			if (this.emailVerificationService.checkCandidateEmailVerification(candidate.getId()).isSuccess()) {
-				this.candidateDao.save(candidate);
+			this.emailVerificationService.setCandidateVerificationCompleted(verificationCode);
+			int x= this.userDao.findAll().size() + 1;
+			candidate.setId(x);
+			this.candidateDao.save(candidate); 
+			//burda CandidateEmailVerification daki candidateId alanına nasıl ekleme yapılacak?
+			return new SuccessResult("Aday eklendi");
+			/*if (this.emailVerificationService.checkCandidateEmailVerification(verificationCode).isSuccess()) {
+				this.candidateDao.save(candidate); 
 				return new SuccessResult("Aday eklendi");
-			} 
+			}
 			else return new ErrorResult("Aday eklenmesi için email doğrulaması gerekiyor.");
+			 */
 		}
 		else return new ErrorResult("Aday eklenemedi");
 

@@ -12,10 +12,12 @@ public interface EmailVerificationService {
 	
 	DataResult<List<EmailVerification>> getAll();
 	Result generateVerificationEmailForCandidate(Candidate candidate);
+	//int generateVerificationEmailForCandidate(Candidate candidate);
 	Result generateVerificationEmailForEmployer(Employer employer);
-	Result setCandidateVerificationCompleted(int candidateId);
+	//Result setCandidateVerificationCompleted(int candidateId);
+	public Result setCandidateVerificationCompleted(String code);
 	Result setEmployerVerificationCompleted(int employerId);
-	Result checkCandidateEmailVerification(int candidateId);
+	Result checkCandidateEmailVerification(String code); //int candidateId
 	Result checkEmployerEmailVerification(int employerId);
 
 }
