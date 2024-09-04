@@ -10,7 +10,7 @@ import kodlamaio.hrms.entities.concretes.verifications.EmailVerification;
 public interface EmailVerificationService {
 	
 	DataResult<List<EmailVerification>> getAll();
-	int  generateVerificationEmailForUser(User user);
+	Result  generateVerificationEmailForUser(User user); //int
 	Result setUserVerificationCompleted(String code);
 	Result checkUserEmailVerification(String code);
 	//Result addCandidateEmailVerification(int emailVerificationId, int candidateId);

@@ -45,7 +45,8 @@ public class CandidateManager implements CandidateService{
 		
 		if (this.candidateInfoCheckService.isValidCandidate(candidate).isSuccess()) {
 			
-			int emailVerificationId = this.emailVerificationService.generateVerificationEmailForUser(candidate);
+			//int emailVerificationId = 
+			this.emailVerificationService.generateVerificationEmailForUser(candidate);
 			
 			// Burada aday email doğrulaması yaptı, emailinede gelen linke tıkladı, linkteki random string alındı 
 			//simulasyon:						

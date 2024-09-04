@@ -50,7 +50,8 @@ public class EmployerManager implements EmployerService{
 		
 		if (this.employerInfoCheckService.isValidEmployer(employer).isSuccess()) {
 
-			int emailVerificationId = this.emailVerificationService.generateVerificationEmailForUser(employer);
+			//int emailVerificationId = 
+			this.emailVerificationService.generateVerificationEmailForUser(employer);
 
 			int confirmationId = this.employeeConfirmService.generateEmployeeConfirmation(employer);
 			

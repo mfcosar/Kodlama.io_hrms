@@ -12,30 +12,21 @@ import kodlamaio.hrms.core.utilities.results.ErrorResult;
 import kodlamaio.hrms.core.utilities.results.Result;
 import kodlamaio.hrms.core.utilities.results.SuccessDataResult;
 import kodlamaio.hrms.core.utilities.results.SuccessResult;
-import kodlamaio.hrms.dataAccess.abstracts.verifications.CandidateEmailVerificationDao;
 import kodlamaio.hrms.dataAccess.abstracts.verifications.EmailVerificationDao;
-import kodlamaio.hrms.dataAccess.abstracts.verifications.EmployerEmailVerificationDao;
 import kodlamaio.hrms.entities.concretes.User;
-import kodlamaio.hrms.entities.concretes.verifications.CandidateEmailVerification;
 import kodlamaio.hrms.entities.concretes.verifications.EmailVerification;
-import kodlamaio.hrms.entities.concretes.verifications.EmployerEmailVerification;
+
 
 @Service
 public class EmailVerificationManager implements EmailVerificationService{
 	
 	private EmailVerificationDao emailVerificationDao;
-	private CandidateEmailVerificationDao candidateEmailVerificationDao;
-	private EmployerEmailVerificationDao employerEmailVerificationDao;
-	
+
 	
 	@Autowired
-	public EmailVerificationManager(EmailVerificationDao emailVerificationDao,
-			CandidateEmailVerificationDao candidateEmailVerificationDao,
-			EmployerEmailVerificationDao employerEmailVerificationDao) {
+	public EmailVerificationManager(EmailVerificationDao emailVerificationDao) {
 		super();
 		this.emailVerificationDao = emailVerificationDao;
-		this.candidateEmailVerificationDao = candidateEmailVerificationDao;
-		this.employerEmailVerificationDao = employerEmailVerificationDao;
 	}
 
 	@Override
@@ -45,7 +36,7 @@ public class EmailVerificationManager implements EmailVerificationService{
 	}
 
 	@Override
-	public int  generateVerificationEmailForUser(User user) {//daha DB'e kaydedilmedi: Result
+	public Result generateVerificationEmailForUser(User user) {//daha DB'e kaydedilmedi: Result
 	
 		EmailVerification emailVerification = new EmailVerification();
 		emailVerification.setCode(generateNewEmailVerificationCode()+user.getEmail());
@@ -53,12 +44,13 @@ public class EmailVerificationManager implements EmailVerificationService{
 		this.emailVerificationDao.save(emailVerification);
 		
 		sendVerificationEmail(user);
-		return emailVerification.getId();
-		//return new SuccessResult("Kullanıcıya doğrulama kodu gönderildi."); 
+		//return emailVerification.getId();
+		return new SuccessResult("Kullanıcıya doğrulama kodu gönderildi."); 
 	}
 	
 
 	/*@Override
+	 * denendi: DB'de fazladan satır ekliyor emailVerification tablosuna. çözülemedi
 	public Result addCandidateEmailVerification(int emailVerificationId, int candidateId) {
 		CandidateEmailVerification candidateEmailVerification = this.candidateEmailVerificationDao.getReferenceById(emailVerificationId);
 		candidateEmailVerification.setCandidateId(candidateId);

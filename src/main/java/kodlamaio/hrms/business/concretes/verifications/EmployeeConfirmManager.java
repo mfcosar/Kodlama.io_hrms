@@ -10,25 +10,20 @@ import kodlamaio.hrms.core.utilities.results.ErrorResult;
 import kodlamaio.hrms.core.utilities.results.Result;
 import kodlamaio.hrms.core.utilities.results.SuccessResult;
 import kodlamaio.hrms.dataAccess.abstracts.verifications.EmployeeConfirmDao;
-import kodlamaio.hrms.dataAccess.abstracts.verifications.EmployeeConfirmEmployerDao;
 import kodlamaio.hrms.entities.concretes.Employer;
 import kodlamaio.hrms.entities.concretes.verifications.EmployeeConfirm;
-import kodlamaio.hrms.entities.concretes.verifications.EmployeeConfirmEmployer;
 
 @Service
 public class EmployeeConfirmManager implements EmployeeConfirmService{
 	
 	private EmployeeConfirmDao employeeConfirmDao;
-	private EmployeeConfirmEmployerDao employeeConfirmEmployerDao;
 	
 	
 	@Autowired
-	public EmployeeConfirmManager(EmployeeConfirmDao employeeConfirmDao,
-			EmployeeConfirmEmployerDao employeeConfirmEmployerDao) {
+	public EmployeeConfirmManager(EmployeeConfirmDao employeeConfirmDao) {
 		super();
 		this.employeeConfirmDao = employeeConfirmDao;
-		this.employeeConfirmEmployerDao = employeeConfirmEmployerDao;
-	}
+		}
 
 	@Override
 	public int generateEmployeeConfirmation(Employer employer) {
