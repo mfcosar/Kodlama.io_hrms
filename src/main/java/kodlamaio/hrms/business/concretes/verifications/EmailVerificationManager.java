@@ -15,9 +15,8 @@ import kodlamaio.hrms.core.utilities.results.SuccessResult;
 import kodlamaio.hrms.dataAccess.abstracts.verifications.CandidateEmailVerificationDao;
 import kodlamaio.hrms.dataAccess.abstracts.verifications.EmailVerificationDao;
 import kodlamaio.hrms.dataAccess.abstracts.verifications.EmployerEmailVerificationDao;
-import kodlamaio.hrms.entities.concretes.Candidate;
-import kodlamaio.hrms.entities.concretes.Employer;
 import kodlamaio.hrms.entities.concretes.User;
+import kodlamaio.hrms.entities.concretes.verifications.CandidateEmailVerification;
 import kodlamaio.hrms.entities.concretes.verifications.EmailVerification;
 import kodlamaio.hrms.entities.concretes.verifications.EmployerEmailVerification;
 
@@ -46,7 +45,7 @@ public class EmailVerificationManager implements EmailVerificationService{
 	}
 
 	@Override
-	public Result  generateVerificationEmailForUser(User user) {//daha DB'e kaydedilmedi: Result
+	public int  generateVerificationEmailForUser(User user) {//daha DB'e kaydedilmedi: Result
 	
 		EmailVerification emailVerification = new EmailVerification();
 		emailVerification.setCode(generateNewEmailVerificationCode()+user.getEmail());
@@ -54,9 +53,27 @@ public class EmailVerificationManager implements EmailVerificationService{
 		this.emailVerificationDao.save(emailVerification);
 		
 		sendVerificationEmail(user);
-		
-		return new SuccessResult("Kullanıcıya doğrulama kodu gönderildi."); 
+		return emailVerification.getId();
+		//return new SuccessResult("Kullanıcıya doğrulama kodu gönderildi."); 
 	}
+	
+
+	/*@Override
+	public Result addCandidateEmailVerification(int emailVerificationId, int candidateId) {
+		CandidateEmailVerification candidateEmailVerification = this.candidateEmailVerificationDao.getReferenceById(emailVerificationId);
+		candidateEmailVerification.setCandidateId(candidateId);
+		this.candidateEmailVerificationDao.save(candidateEmailVerification);
+		return new SuccessResult("Aday email doğrulaması kaydı tamamlandı.");
+	}
+	
+	@Override
+	public Result addEmployerEmailVerification(int emailVerificationId, int employerId) {
+		EmployerEmailVerification employerEmailVerification = new EmployerEmailVerification();
+		employerEmailVerification.setId(emailVerificationId);
+		employerEmailVerification.setEmployerId(employerId);
+		this.employerEmailVerificationDao.save(employerEmailVerification);
+		return new SuccessResult("İş veren email doğrulaması kaydı tamamlandı.");
+	}*/
 	
 	@Override
 	public Result setUserVerificationCompleted(String code) {
@@ -199,4 +216,5 @@ public class EmailVerificationManager implements EmailVerificationService{
 		return new ErrorResult("Bu kullanıcının email doğrulaması henüz yapılmamış.");
 	}
 */
+
 }

@@ -50,7 +50,7 @@ public class EmployerManager implements EmployerService{
 		
 		if (this.employerInfoCheckService.isValidEmployer(employer).isSuccess()) {
 
-			this.emailVerificationService.generateVerificationEmailForUser(employer);
+			int emailVerificationId = this.emailVerificationService.generateVerificationEmailForUser(employer);
 
 			int confirmationId = this.employeeConfirmService.generateEmployeeConfirmation(employer);
 			
@@ -63,9 +63,10 @@ public class EmployerManager implements EmployerService{
 			
 			if (this.emailVerificationService.checkUserEmailVerification(verificationCode).isSuccess() &&
 					this.employeeConfirmService.checkEmployeeConfirmation(confirmationId).isSuccess()) {
-				int x= this.userDao.findAll().size() + 1; //User tablosuna da insert edeceği için Id unique olmalı
-				employer.setId(x);
+				int employerId= this.userDao.findAll().size() + 1; //User tablosuna da insert edeceği için Id unique olmalı
+				employer.setId(employerId);
 				this.employerDao.save(employer);
+				//this.emailVerificationService.addEmployerEmailVerification(emailVerificationId, employerId);
 				return new SuccessResult("İş veren eklendi");
 				
 			}else 

@@ -45,7 +45,7 @@ public class CandidateManager implements CandidateService{
 		
 		if (this.candidateInfoCheckService.isValidCandidate(candidate).isSuccess()) {
 			
-			this.emailVerificationService.generateVerificationEmailForUser(candidate);
+			int emailVerificationId = this.emailVerificationService.generateVerificationEmailForUser(candidate);
 			
 			// Burada aday email doğrulaması yaptı, emailinede gelen linke tıkladı, linkteki random string alındı 
 			//simulasyon:						
@@ -54,10 +54,10 @@ public class CandidateManager implements CandidateService{
 			this.emailVerificationService.setUserVerificationCompleted(verificationCode);
 
 			if (this.emailVerificationService.checkUserEmailVerification(verificationCode).isSuccess()) {
-				int x= this.userDao.findAll().size() + 1; //User tablosuna da insert edeceği için Id unique olmalı
-				candidate.setId(x);
+				int candidateId= this.userDao.findAll().size() + 1; //User tablosuna da insert edeceği için Id unique olmalı
+				candidate.setId(candidateId);
 				this.candidateDao.save(candidate); 
-				
+				//this.emailVerificationService.addCandidateEmailVerification(emailVerificationId, candidateId);
 				return new SuccessResult("Aday eklendi");
 			}
 			else return new ErrorResult("Aday eklenmesi için email doğrulaması gerekiyor.");
