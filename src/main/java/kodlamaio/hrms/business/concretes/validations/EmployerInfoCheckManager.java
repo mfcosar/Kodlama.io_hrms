@@ -93,8 +93,8 @@ public class EmployerInfoCheckManager implements EmployerInfoCheckService{
 
 	@Override
 	public Result isValidEmployer(Employer employer) {
-		if (checkAllFieldsEntered(employer).isSuccess() && checkWebAndEmailDomainIsSame(employer.getWebAddress(), employer.getEmail()).isSuccess()
-				&& checkEmailIsUnique(employer.getEmail()).isSuccess())
+		if (checkAllFieldsEntered(employer).isSuccess() &&  checkEmailIsUnique(employer.getEmail()).isSuccess())
+				//&&checkWebAndEmailDomainIsSame(employer.getWebAddress(), employer.getEmail()).isSuccess())
 			return new SuccessResult("Bu şirketin bilgileri kayıt için uygundur.");
 		
 		else return new ErrorResult("Bu şirketin bilgileri kayıt için uygun değildir.");

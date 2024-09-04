@@ -15,6 +15,7 @@ import kodlamaio.hrms.core.utilities.results.Result;
 import kodlamaio.hrms.core.utilities.results.SuccessDataResult;
 import kodlamaio.hrms.core.utilities.results.SuccessResult;
 import kodlamaio.hrms.dataAccess.abstracts.EmployerDao;
+import kodlamaio.hrms.dataAccess.abstracts.UserDao;
 import kodlamaio.hrms.entities.concretes.Employer;
 
 
@@ -25,15 +26,17 @@ public class EmployerManager implements EmployerService{
 	private EmailVerificationService emailVerificationService;
 	private EmployeeConfirmService employeeConfirmService;
 	private EmployerInfoCheckService employerInfoCheckService;
+	private UserDao userDao;
 	
 	@Autowired
 	public EmployerManager(EmployerDao employerDao, EmailVerificationService emailVerificationService,
-			EmployeeConfirmService employeeConfirmService, EmployerInfoCheckService employerInfoCheckService) {
+			EmployeeConfirmService employeeConfirmService, EmployerInfoCheckService employerInfoCheckService, UserDao userDao) {
 		super();
 		this.employerDao = employerDao;
 		this.emailVerificationService = emailVerificationService;
 		this.employeeConfirmService = employeeConfirmService;
 		this.employerInfoCheckService = employerInfoCheckService;
+		this.userDao = userDao;
 	}
 
 
@@ -46,21 +49,22 @@ public class EmployerManager implements EmployerService{
 	public Result add(Employer employer) {
 		
 		if (this.employerInfoCheckService.isValidEmployer(employer).isSuccess()) {
-			//send verification email
-			this.emailVerificationService.generateVerificationEmailForEmployer(employer);
-			//send confirmation to employees
-			this.employeeConfirmService.generateEmployeeConfirmation(employer);
-			
-			
-			// Burada şirket email doğrulaması yaptı. 
-			this.emailVerificationService.setEmployerVerificationCompleted(employer.getId());
 
-			// Burada şirket  HRMS personeli (1 nolu employeeId olan) tarafından onaylandı. 
-			this.employeeConfirmService.confirmEmployer(employer, 1); 
+			this.emailVerificationService.generateVerificationEmailForUser(employer);
+
+			int confirmationId = this.employeeConfirmService.generateEmployeeConfirmation(employer);
 			
-			if ( this.emailVerificationService.checkEmployerEmailVerification(employer.getId()).isSuccess() &&
-					this.employeeConfirmService.checkEmployeeConfirmation(employer.getId()).isSuccess()) {
-				
+			// Burada şirket email doğrulaması yaptı. Simulasyon
+			String verificationCode = "generateRandomCodeHere0123456789" + employer.getEmail();
+			this.emailVerificationService.setUserVerificationCompleted(verificationCode);//henüz DB'e kaydeilmedi, id'si yok
+			
+			// Burada şirket  HRMS personeli (1 nolu employeeId olan) tarafından onaylandı. 
+			this.employeeConfirmService.confirmEmployer(confirmationId , employer, 1); 
+			
+			if (this.emailVerificationService.checkUserEmailVerification(verificationCode).isSuccess() &&
+					this.employeeConfirmService.checkEmployeeConfirmation(confirmationId).isSuccess()) {
+				int x= this.userDao.findAll().size() + 1; //User tablosuna da insert edeceği için Id unique olmalı
+				employer.setId(x);
 				this.employerDao.save(employer);
 				return new SuccessResult("İş veren eklendi");
 				

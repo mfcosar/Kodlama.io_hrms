@@ -45,24 +45,23 @@ public class CandidateManager implements CandidateService{
 		
 		if (this.candidateInfoCheckService.isValidCandidate(candidate).isSuccess()) {
 			
-			this.emailVerificationService.generateVerificationEmailForCandidate(candidate);
+			this.emailVerificationService.generateVerificationEmailForUser(candidate);
 			
 			// Burada aday email doğrulaması yaptı, emailinede gelen linke tıkladı, linkteki random string alındı 
 			//simulasyon:						
 			String verificationCode = "generateRandomCodeHere0123456789" + candidate.getEmail();
 			
-			this.emailVerificationService.setCandidateVerificationCompleted(verificationCode);
-			int x= this.userDao.findAll().size() + 1;
-			candidate.setId(x);
-			this.candidateDao.save(candidate); 
-			//burda CandidateEmailVerification daki candidateId alanına nasıl ekleme yapılacak?
-			return new SuccessResult("Aday eklendi");
-			/*if (this.emailVerificationService.checkCandidateEmailVerification(verificationCode).isSuccess()) {
+			this.emailVerificationService.setUserVerificationCompleted(verificationCode);
+
+			if (this.emailVerificationService.checkUserEmailVerification(verificationCode).isSuccess()) {
+				int x= this.userDao.findAll().size() + 1; //User tablosuna da insert edeceği için Id unique olmalı
+				candidate.setId(x);
 				this.candidateDao.save(candidate); 
+				
 				return new SuccessResult("Aday eklendi");
 			}
 			else return new ErrorResult("Aday eklenmesi için email doğrulaması gerekiyor.");
-			 */
+			 
 		}
 		else return new ErrorResult("Aday eklenemedi");
 
@@ -70,7 +69,7 @@ public class CandidateManager implements CandidateService{
 
 	@Override
 	public DataResult<Candidate> findCandidateById(int candidateId) {
-		return new SuccessDataResult<Candidate>(this.candidateDao.findCandidateById(candidateId), "Ada bilgisi listelendi");
+		return new SuccessDataResult<Candidate>(this.candidateDao.findCandidateById(candidateId), "Aday bilgisi listelendi");
 	}
 	
 }

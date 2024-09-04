@@ -31,35 +31,26 @@ public class EmployeeConfirmManager implements EmployeeConfirmService{
 	}
 
 	@Override
-	public Result generateEmployeeConfirmation(Employer employer) {
+	public int generateEmployeeConfirmation(Employer employer) {
 		
 		EmployeeConfirm employeeConfirm = new EmployeeConfirm();
+		employeeConfirm.setEmployeeId(1);//default, fk olduğu için zorunlu girildi
+		employeeConfirm.setConfirmed(false);
 		this.employeeConfirmDao.save(employeeConfirm);
 		
-		EmployeeConfirmEmployer employeeConfirmEmployer = new EmployeeConfirmEmployer();
-		employeeConfirmEmployer.setId(employeeConfirm.getId());
-		employeeConfirmEmployer.setEmployerId(employer.getId());
-		this.employeeConfirmEmployerDao.save(employeeConfirmEmployer);
-		
-		return new SuccessResult("İş vereni onaylama talebi oluşturuldu");
+		//display in system and wait for personnel to check employer
+		return employeeConfirm.getId();
+		//return new SuccessResult("İş vereni onaylama talebi oluşturuldu");
 	
 	}
 
 	@Override
-	public Result confirmEmployer(Employer employer, int employeeId) {
-		int employeeConfirmId=0;
-		
-		for (EmployeeConfirmEmployer x: this.employeeConfirmEmployerDao.findAll()) {
-			
-			if(x.getEmployerId() == employer.getId())
-				employeeConfirmId = x.getId();
-		}
+	public Result confirmEmployer(int confirmationId, Employer employer, int employeeId) {
 	
-		EmployeeConfirm employeeConfirm = this.employeeConfirmDao.getReferenceById(employeeConfirmId);
+		EmployeeConfirm employeeConfirm = this.employeeConfirmDao.getReferenceById(confirmationId);
+		employeeConfirm.setEmployeeId(employeeId);
 		employeeConfirm.setConfirmed(true);
 		employeeConfirm.setConfirmDate(new Date());
-		employeeConfirm.setEmployeeId(employeeId);
-		
 		this.employeeConfirmDao.save(employeeConfirm);
 		
 		return new SuccessResult("İş veren onaylandı: " +  employeeId);
@@ -67,15 +58,9 @@ public class EmployeeConfirmManager implements EmployeeConfirmService{
 	}
 
 	@Override
-	public Result checkEmployeeConfirmation(int employerId) {
-		int employeeConfirmId=0;
-		
-		for (EmployeeConfirmEmployer x: this.employeeConfirmEmployerDao.findAll()) {
-			
-			if(x.getEmployerId() == employerId)
-				employeeConfirmId = x.getId();
-		}
-		EmployeeConfirm employeeConfirm = this.employeeConfirmDao.getReferenceById(employeeConfirmId);
+	public Result checkEmployeeConfirmation(int confirmationId) {
+
+		EmployeeConfirm employeeConfirm = this.employeeConfirmDao.getReferenceById(confirmationId);
 		
 		if (employeeConfirm.isConfirmed())
 			return new SuccessResult("İş veren HRMS personeli tarafından onaylanmış. ");
