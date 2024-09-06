@@ -51,6 +51,7 @@ public class EmailVerificationManager implements EmailVerificationService{
 
 	/*@Override
 	 * denendi: DB'de fazladan satır ekliyor emailVerification tablosuna. çözülemedi
+	 * 
 	public Result addCandidateEmailVerification(int emailVerificationId, int candidateId) {
 		CandidateEmailVerification candidateEmailVerification = this.candidateEmailVerificationDao.getReferenceById(emailVerificationId);
 		candidateEmailVerification.setCandidateId(candidateId);
