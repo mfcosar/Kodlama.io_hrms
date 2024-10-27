@@ -10,35 +10,34 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import kodlamaio.hrms.business.abstracts.CityService;
+import kodlamaio.hrms.business.abstracts.EmployeeService;
 import kodlamaio.hrms.core.utilities.results.DataResult;
 import kodlamaio.hrms.core.utilities.results.Result;
-import kodlamaio.hrms.entities.concretes.City;
-
+import kodlamaio.hrms.entities.concretes.Employee;
 
 @RestController
-@RequestMapping("/api/cities")
+@RequestMapping("/api/employees")
 @CrossOrigin
-public class CitiesController {
+public class EmployeesController {
 	
-	private CityService cityService;
+	private EmployeeService employeeService;
 
 	@Autowired
-	public CitiesController(CityService cityService) {
+	public EmployeesController(EmployeeService employeeService) {
 		super();
-		this.cityService = cityService;
+		this.employeeService = employeeService;
 	}
 	
-	
-	@GetMapping("/getall") //Buradaki A harfini büyk yazdığım için tam 2 gündür bütün projeyi DB scriptten tut entitylere kadar defalarca yeniden gözden geçirdim!-1.8.2024
-	public DataResult<List<City>> getAll(){
+	@GetMapping("/getall") 
+	public DataResult<List<Employee>> getAll(){
 		
-		return this.cityService.getAll();
+		return this.employeeService.getAll();
 	}
 	
 	@PostMapping("/add")
-	public Result add(@RequestBody City city) {
-		return this.cityService.add(city);
+	public Result add(@RequestBody Employee employee) {
+		return this.employeeService.add(employee);
 	}
+	
 
 }

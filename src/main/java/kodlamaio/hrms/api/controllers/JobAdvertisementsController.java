@@ -3,7 +3,9 @@ package kodlamaio.hrms.api.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+//import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +20,7 @@ import kodlamaio.hrms.entities.dtos.JobAdvertisementDto;
 
 @RestController
 @RequestMapping("/api/jobAdvertisements")
+@CrossOrigin //front end'in istek yapabilmesi için
 public class JobAdvertisementsController {
 	
 	private JobAdvertisementService jobAdvertisementService;
@@ -35,7 +38,7 @@ public class JobAdvertisementsController {
 	}
 	
 	@PostMapping("/add")
-	public Result add(@RequestBody JobAdvertisement jobAdvertisement) {
+	public Result add(@RequestBody JobAdvertisement jobAdvertisement) { //@RequestParam
 		return this.jobAdvertisementService.add(jobAdvertisement);
 	}
 
@@ -64,7 +67,7 @@ public class JobAdvertisementsController {
 		return this.jobAdvertisementService.findJobAdvertisementDtosByEmployerCompanyNameAndActive(companyName);
 	}
 	
-	@GetMapping("/deactivatebyid") 
+	@PostMapping("/deactivatebyid") 
 	public DataResult<JobAdvertisement> deactiveJobAdvertisement(@RequestParam int jobAdvertisementId){
 		
 		return this.jobAdvertisementService.deactiveJobAdvertisement(jobAdvertisementId);
@@ -74,6 +77,24 @@ public class JobAdvertisementsController {
 	public DataResult<List<JobAdvertisementDto>> getAllDtos(){
 		
 		return this.jobAdvertisementService.getAllJobAdvertisementDtos();
+	}
+	
+	@GetMapping("/getbyid") 
+	public DataResult<JobAdvertisement> getJobAdvertisementById(@RequestParam(name="id") int id){
+		
+		return this.jobAdvertisementService.findJobAdvertisementById(id);
+	}
+	
+	@GetMapping("/getallunconfirmed") 
+	public DataResult<List<JobAdvertisement>> getUnconfirmedJobAdvertisements(){
+		
+		return this.jobAdvertisementService.getUnconfirmedJobAdvertisements();
+	}
+	
+	@PostMapping("/confirmbyid") 
+	public DataResult<JobAdvertisement> confirmJobAdvertisement(@RequestParam int jobAdvertisementId){
+		
+		return this.jobAdvertisementService.confirmJobAdvertisementById(jobAdvertisementId);
 	}
 	
 }

@@ -48,6 +48,14 @@ public class JobAdvertisement {
 	@ManyToOne()
 	@JoinColumn(name="city_id")
 	private City city;
+	
+	@ManyToOne()
+	@JoinColumn(name="working_time_id")
+	private WorkingTime workingTime;
+	
+	@ManyToOne()
+	@JoinColumn(name="working_type_id")
+	private WorkingType workingType;
 
 	@Column(name="description")
 	private String description;
@@ -70,6 +78,9 @@ public class JobAdvertisement {
 	private Date publicationDate;
 	
 	@Column(name="is_active")
-	private boolean isActive;
+	private boolean isActive=true;
+	
+	@Column(name="is_confirmed")
+	private boolean isConfirmed=false;
 	
 }

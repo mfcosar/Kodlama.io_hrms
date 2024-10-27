@@ -11,11 +11,16 @@ import kodlamaio.hrms.entities.dtos.JobAdvertisementDto;
 public interface JobAdvertisementDao extends JpaRepository<JobAdvertisement, Integer>{
 	
 	JobAdvertisement findById(int jobAdvertisementId);
+	List<JobAdvertisement> findByIsConfirmedFalseOrderById();
 	
 	//dto operations
 	@Query("SELECT new kodlamaio.hrms.entities.dtos.JobAdvertisementDto(e.companyName, j.jobTitle, ja.openPositionAmount, ja.publicationDate, ja.lastApplicationDate  ) "
 			+ "FROM JobAdvertisement ja JOIN ja.job j JOIN ja.employer e WHERE ja.isActive = true")
 	List<JobAdvertisementDto> findJobAdvertisementDtosActive();
+	
+	/*@Query("SELECT new kodlamaio.hrms.entities.dtos.JobAdvertisementDto(e.companyName, j.jobTitle, ja.openPositionAmount, ja.publicationDate, ja.lastApplicationDate  ) "
+			+ "FROM JobAdvertisement ja JOIN ja.job j JOIN ja.employer e WHERE ja.id = :id")
+	List<JobAdvertisementDto> findJobAdvertisementDtoById(int id); */
 	
 	@Query("SELECT new kodlamaio.hrms.entities.dtos.JobAdvertisementDto(e.companyName, j.jobTitle, ja.openPositionAmount, ja.publicationDate, ja.lastApplicationDate  ) "
 			+ "FROM JobAdvertisement ja JOIN ja.job j JOIN ja.employer e WHERE ja.isActive = true ORDER BY ja.publicationDate ASC")
@@ -31,6 +36,7 @@ public interface JobAdvertisementDao extends JpaRepository<JobAdvertisement, Int
 	
 	@Query("SELECT new kodlamaio.hrms.entities.dtos.JobAdvertisementDto(e.companyName, j.jobTitle, ja.openPositionAmount, ja.publicationDate, ja.lastApplicationDate  ) "
 			+ "FROM JobAdvertisement ja JOIN ja.job j JOIN ja.employer e ORDER BY ja.publicationDate ASC ")
+	
 	List<JobAdvertisementDto> getAllJobAdvertisementDtos();
 	
 	/* List<JobAdvertisement> findByIsActiveTrue();

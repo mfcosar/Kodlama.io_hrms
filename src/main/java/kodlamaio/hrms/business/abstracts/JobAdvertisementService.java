@@ -12,6 +12,8 @@ public interface JobAdvertisementService {
 	DataResult<List<JobAdvertisement>> getAll();
 	Result add(JobAdvertisement jobAdvertisement);
 	DataResult<JobAdvertisement> deactiveJobAdvertisement(int jobAdvertisementId);
+	DataResult<List<JobAdvertisement>> getUnconfirmedJobAdvertisements();
+	DataResult<JobAdvertisement> confirmJobAdvertisementById(int jobAdvertisementId);
 	
 	//dtos
 	DataResult<List<JobAdvertisementDto>> findJobAdvertisementDtosActive();
@@ -19,6 +21,8 @@ public interface JobAdvertisementService {
 	DataResult<List<JobAdvertisementDto>> findJobAdvertisementDtosByEmployerIdAndActive(int employerId);
 	DataResult<List<JobAdvertisementDto>> findJobAdvertisementDtosByEmployerCompanyNameAndActive(String companyName);
 	DataResult<List<JobAdvertisementDto>> getAllJobAdvertisementDtos();
+	
+	DataResult<JobAdvertisement> findJobAdvertisementById(int id);
 	
 	//DataResult<List<JobAdvertisement>> findByIsActiveTrue();
 	//DataResult<List<JobAdvertisement>> findByIsActiveTrueOrderByPublicationDateAsc(); 

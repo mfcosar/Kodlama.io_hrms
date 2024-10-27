@@ -71,6 +71,28 @@ public class JobAdvertisementManager implements JobAdvertisementService{
 		return new SuccessDataResult<List<JobAdvertisementDto>>(this.jobAdvertisementDao.getAllJobAdvertisementDtos(), "Sistemdeki tüm iş ilanları listelendi");
 	}
 
+
+	
+	@Override
+	public DataResult<JobAdvertisement> findJobAdvertisementById(int jobAdvertisementId) {
+
+		return new SuccessDataResult<JobAdvertisement>(this.jobAdvertisementDao.findById(jobAdvertisementId), jobAdvertisementId+ " : Nolu iş ilanı listelendi");
+	}
+
+	@Override
+	public DataResult<List<JobAdvertisement>> getUnconfirmedJobAdvertisements() {
+		return new SuccessDataResult<List<JobAdvertisement>>(this.jobAdvertisementDao.findByIsConfirmedFalseOrderById(), "Sistemdeki tüm onaylanmamış iş ilanları listelendi");
+	}
+
+	@Override
+	public DataResult<JobAdvertisement> confirmJobAdvertisementById(int jobAdvertisementId) {
+		JobAdvertisement ja = this.jobAdvertisementDao.findById(jobAdvertisementId);
+		ja.setConfirmed(true);
+		this.jobAdvertisementDao.save(ja); //Db'nin save etmesi gerek
+		return new SuccessDataResult<JobAdvertisement>(this.jobAdvertisementDao.findById(jobAdvertisementId), jobAdvertisementId+ " : Nolu iş ilanı onaylandı");
+
+	}
+
 	
 
 }

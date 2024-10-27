@@ -9,36 +9,32 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import kodlamaio.hrms.business.abstracts.CityService;
+import kodlamaio.hrms.business.abstracts.WorkingTypeService;
 import kodlamaio.hrms.core.utilities.results.DataResult;
 import kodlamaio.hrms.core.utilities.results.Result;
-import kodlamaio.hrms.entities.concretes.City;
-
+import kodlamaio.hrms.entities.concretes.WorkingType;
 
 @RestController
-@RequestMapping("/api/cities")
-@CrossOrigin
-public class CitiesController {
-	
-	private CityService cityService;
+@RequestMapping("/api/workingtypes")
+@CrossOrigin //front end'in istek yapabilmesi için
+public class WorkingTypesController {
+
+	private WorkingTypeService workingTypeService;
 
 	@Autowired
-	public CitiesController(CityService cityService) {
+	public WorkingTypesController(WorkingTypeService workingTypeService) {
 		super();
-		this.cityService = cityService;
+		this.workingTypeService = workingTypeService;
 	}
 	
-	
-	@GetMapping("/getall") //Buradaki A harfini büyk yazdığım için tam 2 gündür bütün projeyi DB scriptten tut entitylere kadar defalarca yeniden gözden geçirdim!-1.8.2024
-	public DataResult<List<City>> getAll(){
+	@GetMapping("/getall") 
+	public DataResult<List<WorkingType>> getAll(){
 		
-		return this.cityService.getAll();
+		return this.workingTypeService.getAll();
+	}
+	@PostMapping("/add")
+	public Result add(@RequestBody WorkingType workingType) {
+		return this.workingTypeService.add(workingType);
 	}
 	
-	@PostMapping("/add")
-	public Result add(@RequestBody City city) {
-		return this.cityService.add(city);
-	}
-
 }
