@@ -32,6 +32,7 @@ public class WorkingTypesController {
 		
 		return this.workingTypeService.getAll();
 	}
+	
 	@PostMapping("/add")
 	public Result add(@RequestBody WorkingType workingType) {
 		return this.workingTypeService.add(workingType);

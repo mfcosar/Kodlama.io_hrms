@@ -29,7 +29,6 @@ public class CitiesController {
 		this.cityService = cityService;
 	}
 	
-	
 	@GetMapping("/getall") //Buradaki A harfini büyk yazdığım için tam 2 gündür bütün projeyi DB scriptten tut entitylere kadar defalarca yeniden gözden geçirdim!-1.8.2024
 	public DataResult<List<City>> getAll(){
 		
