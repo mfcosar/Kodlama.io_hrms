@@ -6,19 +6,25 @@ import java.util.stream.Collectors;
 
 import jakarta.validation.Valid;
 import kodlamaio.hrms.core.entities.ERole;
+import kodlamaio.hrms.core.entities.RefreshToken;
 import kodlamaio.hrms.core.entities.Role;
 import kodlamaio.hrms.dataAccess.abstracts.RoleDao;
 import kodlamaio.hrms.dataAccess.abstracts.UserDao;
 import kodlamaio.hrms.entities.concretes.User;
 import kodlamaio.hrms.payload.request.LoginRequest;
 import kodlamaio.hrms.payload.request.SignupRequest;
+import kodlamaio.hrms.payload.request.TokenRefreshRequest;
 import kodlamaio.hrms.payload.response.JwtResponse;
 import kodlamaio.hrms.payload.response.MessageResponse;
+import kodlamaio.hrms.payload.response.TokenRefreshResponse;
 import kodlamaio.hrms.security.jwt.JwtUtils;
+import kodlamaio.hrms.security.jwt.exceptions.TokenRefreshException;
+import kodlamaio.hrms.security.services.RefreshTokenService;
 import kodlamaio.hrms.security.services.UserDetailsImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -50,30 +56,48 @@ public class AuthController {
 
   @Autowired
   JwtUtils jwtUtils;
+  
+  @Autowired
+  RefreshTokenService refreshTokenService;
 
   @PostMapping("/signin")
   public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
-    Authentication authentication = authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+    Authentication authentication = authenticationManager
+        .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
     SecurityContextHolder.getContext().setAuthentication(authentication);
-    String jwt = jwtUtils.generateJwtToken(authentication);
-    
-    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();    
-    List<String> roles = userDetails.getAuthorities().stream()
-        .map(item -> item.getAuthority())
+
+    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+    String jwt = jwtUtils.generateJwtToken(userDetails);
+
+    List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
         .collect(Collectors.toList());
 
-    return ResponseEntity.ok(new JwtResponse(jwt, 
-                         userDetails.getId(), 
-                         userDetails.getUsername(), 
-                         userDetails.getEmail(), 
-                         roles));
+    RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+
+    return ResponseEntity.ok(new JwtResponse(jwt, refreshToken.getToken(), userDetails.getId(),
+        userDetails.getUsername(), userDetails.getEmail(), roles));
   }
+  
+  @PostMapping("/refreshtoken")
+  public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
+    String requestRefreshToken = request.getRefreshToken();
+
+    return refreshTokenService.findByToken(requestRefreshToken)
+        .map(refreshTokenService :: verifyExpiration)
+        .map(RefreshToken::getUser)
+        .map(user -> {
+          String token = jwtUtils.generateTokenFromUsername(user.getUsername());
+          return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
+        })
+        .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
+            "Refresh token is not in database!"));
+  }
+  
 
   @PostMapping("/signup")
-  //@GetMapping("/signup")
   public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
     if (userRepository.existsByUsername(signUpRequest.getUsername())) {
       return ResponseEntity
@@ -140,4 +164,15 @@ public class AuthController {
 
     return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
   }
+  
+  
+  @PostMapping("/signout")
+  @PreAuthorize("hasRole('ROLE_CANDIDATE') or hasRole('ROLE_EMPLOYER') or hasRole('ROLE_ADMIN')")
+  public ResponseEntity<?> logoutUser() { 
+    UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    int userId = userDetails.getId();
+    refreshTokenService.deleteByUserId(userId);
+    return ResponseEntity.ok(new MessageResponse("Log out successful!"));
+  }
+
 }

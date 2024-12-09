@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +18,7 @@ import kodlamaio.hrms.core.utilities.results.DataResult;
 import kodlamaio.hrms.core.utilities.results.Result;
 import kodlamaio.hrms.entities.dtos.cv.ImageDto;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/images")
 public class ImagesController {
@@ -30,6 +33,13 @@ public class ImagesController {
 	@GetMapping("/findByCandidateId") 
 	public DataResult<List<ImageDto>> findByCandidateId(@RequestParam int candidateId){
 		return this.imageService.findImageDtosByCandidateId(candidateId);
+	}
+	
+	@GetMapping("/findByCandidateIdFirst") 
+	@PreAuthorize("hasRole('ROLE_CANDIDATE')")
+	public String findByCandidateIdFirst(@RequestParam int candidateId){
+		
+		return this.imageService.findImageDtosByCandidateId(candidateId).getData().getFirst().getImagePath();
 	}
 	
 	/*@PostMapping("/addbyfile")

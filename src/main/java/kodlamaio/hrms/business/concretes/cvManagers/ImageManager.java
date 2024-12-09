@@ -77,9 +77,15 @@ public class ImageManager implements ImageService{
 
 	
 
-	/*@Override
+	/*@Override	}*/
 	public DataResult<List<Image>> findByCandidateId(int candidateId) {
 		
 		return new SuccessDataResult<List<Image>>(this.imageDao.findByCandidateId(candidateId), "Data Listelendi");
+	}
+	
+	/*public DataResult<Image> findByCandidateIdFirst(int candidateId) {
+		
+		return new SuccessDataResult<Image>(this.imageDao.findByCandidateId(candidateId).get(0), "Data Listelendi");
 	}*/
+	
 }

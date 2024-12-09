@@ -19,6 +19,7 @@ import kodlamaio.hrms.entities.concretes.Candidate;
 @RestController
 @RequestMapping("/api/candidates")
 @CrossOrigin //front end'in istek yapabilmesi için
+
 public class CandidatesController {
 	
 	private CandidateService candidateService;
@@ -38,4 +39,6 @@ public class CandidatesController {
 	public Result add(@RequestBody Candidate candidate) {
 		return this.candidateService.add(candidate);
 	}
+
+	
 }

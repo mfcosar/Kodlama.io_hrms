@@ -55,6 +55,17 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
     return new BCryptPasswordEncoder();
   }
   
+	private static final String[] AUTH_WHITELIST = {
+            // -- swagger ui
+            "/v2/api-docs/**",
+            "/v3/api-docs/**",  
+            "/webjars/**",
+            "/swagger-resources/**", 
+            "/swagger-ui/**",
+            "/swagger-ui.html/**",
+            "/api/trial/**"
+             };
+  
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.csrf(csrf -> csrf.disable())
@@ -63,6 +74,9 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
         .authorizeHttpRequests(auth -> 
           auth.requestMatchers("/api/auth/**").permitAll()
               .requestMatchers("/api/test/**").permitAll()
+              .requestMatchers(AUTH_WHITELIST).permitAll()
+              .requestMatchers("/api/jobAdvertisements/getall").permitAll()
+              .requestMatchers("/api/jobAdvertisements/getbyid/{id}").permitAll()
               .anyRequest().authenticated()
         );
     

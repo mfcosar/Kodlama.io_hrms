@@ -23,22 +23,30 @@ public class TestController {
   public String userAccess() {
     return "User Content.";
   }
-
+  
+  @GetMapping("/candidate")
+  @PreAuthorize("hasRole('ROLE_CANDIDATE')")
+  public String candidateAccess() {
+    return "Candidate Board.";
+  }  
+  
   @GetMapping("/employer")
   @PreAuthorize("hasRole('ROLE_EMPLOYER')")
   public String employerAccess() {
     return "Employer Board.";
   }
-
+ 
+  @GetMapping("/employee")
+  @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
+  public String employeeAccess() {
+    return "Employee Board.";
+  }
+  
   @GetMapping("/admin")
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   public String adminAccess() {
     return "Admin Board.";
   }
 
-  @GetMapping("/candidate")
-  @PreAuthorize("hasRole('ROLE_CANDIDATE')")
-  public String candidateAccess() {
-    return "Candidate Board.";
-  }  
+
 }

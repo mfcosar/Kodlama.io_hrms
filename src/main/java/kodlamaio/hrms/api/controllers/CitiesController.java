@@ -18,7 +18,7 @@ import kodlamaio.hrms.entities.concretes.City;
 
 @RestController
 @RequestMapping("/api/cities")
-@CrossOrigin
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class CitiesController {
 	
 	private CityService cityService;

@@ -15,6 +15,6 @@ public interface ImageDao extends JpaRepository<Image, Integer>{
 			+ "FROM Image i JOIN i.candidate c WHERE c.id = :candidateId ")
 	List<ImageDto> findImageDtosByCandidateId(int candidateId);
 	
-	//	List<Image> findByCandidateId(int candidateId);
+	List<Image> findByCandidateId(int candidateId);
 
 }
