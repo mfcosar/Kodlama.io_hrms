@@ -27,7 +27,7 @@ public class TestController {
   @GetMapping("/candidate")
   @PreAuthorize("hasRole('ROLE_CANDIDATE')")
   public String candidateAccess() {
-    return "Candidate Board.";
+    return "Candidate role is authenticated and Candidate Board is retrieved from backend.";
   }  
   
   @GetMapping("/employer")

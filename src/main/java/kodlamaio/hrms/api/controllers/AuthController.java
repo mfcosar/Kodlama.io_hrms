@@ -5,13 +5,17 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import jakarta.validation.Valid;
+import kodlamaio.hrms.business.abstracts.CandidateService;
 import kodlamaio.hrms.core.entities.ERole;
 import kodlamaio.hrms.core.entities.RefreshToken;
 import kodlamaio.hrms.core.entities.Role;
+import kodlamaio.hrms.dataAccess.abstracts.CandidateDao;
 import kodlamaio.hrms.dataAccess.abstracts.RoleDao;
 import kodlamaio.hrms.dataAccess.abstracts.UserDao;
+import kodlamaio.hrms.entities.concretes.Candidate;
 import kodlamaio.hrms.entities.concretes.User;
 import kodlamaio.hrms.payload.request.LoginRequest;
+import kodlamaio.hrms.payload.request.SignupCandidateRequest;
 import kodlamaio.hrms.payload.request.SignupRequest;
 import kodlamaio.hrms.payload.request.TokenRefreshRequest;
 import kodlamaio.hrms.payload.response.JwtResponse;
@@ -24,14 +28,13 @@ import kodlamaio.hrms.security.services.UserDetailsImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
-//import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,6 +50,12 @@ public class AuthController {
 
   @Autowired
   UserDao userRepository;
+  
+  @Autowired
+  CandidateDao candidateRepository;
+  
+  @Autowired
+  CandidateService candidateService;
 
   @Autowired
   RoleDao roleRepository;
@@ -97,7 +106,7 @@ public class AuthController {
   }
   
 
-  @PostMapping("/signup")
+  @PostMapping("/signup/user")
   public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
     if (userRepository.existsByUsername(signUpRequest.getUsername())) {
       return ResponseEntity
@@ -165,9 +174,84 @@ public class AuthController {
     return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
   }
   
+  @PostMapping("/signup/candidate")
+  public ResponseEntity<?> registerCandidate(@Valid @RequestBody SignupCandidateRequest signUpCandidateRequest) {
+	  
+    if (userRepository.existsByUsername(signUpCandidateRequest.getUsername())) {
+      return ResponseEntity
+          .badRequest()
+          .body(new MessageResponse("Error: Username is already taken!"));
+    }
+
+    if (userRepository.existsByEmail(signUpCandidateRequest.getEmail())) {
+      return ResponseEntity
+          .badRequest()
+          .body(new MessageResponse("Error: Email is already in use!"));
+    }
+    
+    if (candidateRepository.existsByTcIdentityNumber(signUpCandidateRequest.getTcIdentityNumber())){
+        return ResponseEntity
+            .badRequest()
+            .body(new MessageResponse("Error: TC identity number is already in use!"));
+      }    
+
+    // Create new candidate's account
+    Candidate newCandidate = new Candidate(signUpCandidateRequest.getUsername(), signUpCandidateRequest.getEmail(),
+               encoder.encode(signUpCandidateRequest.getPassword()), 
+               signUpCandidateRequest.getFirstName(), signUpCandidateRequest.getLastName(),
+               signUpCandidateRequest.getTcIdentityNumber(), signUpCandidateRequest.getBirthYear());
+    //signUpCandidateRequest.isVerified(), signUpCandidateRequest.getVerificationExpiry(),
+
+    Set<String> strRoles = signUpCandidateRequest.getRole();
+    Set<Role> roles = new HashSet<>();
+
+    if (strRoles == null) {
+      Role candidateRole = roleRepository.findByName(ERole.ROLE_CANDIDATE)
+          .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+      roles.add(candidateRole);
+    } else {
+      strRoles.forEach(role -> {
+        switch (role) {
+        case "admin":
+          Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
+              .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+          roles.add(adminRole);
+
+          break;
+        case "candidate":
+            Role candidateRole = roleRepository.findByName(ERole.ROLE_CANDIDATE)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+            roles.add(candidateRole);
+
+            break;               
+        case "employer":
+          Role employerRole = roleRepository.findByName(ERole.ROLE_EMPLOYER)
+              .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+          roles.add(employerRole);
+
+          break;
+        case "employee":
+            Role employeeRole = roleRepository.findByName(ERole.ROLE_EMPLOYEE)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+            roles.add(employeeRole);
+
+            break;
+       
+        default:
+          Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+              .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+          roles.add(userRole);
+        }
+      });
+    }
+
+    newCandidate.setRoles(roles);
+    candidateService.add(newCandidate);
+
+    return ResponseEntity.ok(new MessageResponse("Candidate registered successfully!"));
+  }
   
   @PostMapping("/signout")
-  @PreAuthorize("hasRole('ROLE_CANDIDATE') or hasRole('ROLE_EMPLOYER') or hasRole('ROLE_ADMIN')")
   public ResponseEntity<?> logoutUser() { 
     UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     int userId = userDetails.getId();

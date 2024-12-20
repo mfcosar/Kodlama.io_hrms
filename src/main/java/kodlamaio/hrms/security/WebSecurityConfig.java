@@ -77,6 +77,8 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
               .requestMatchers(AUTH_WHITELIST).permitAll()
               .requestMatchers("/api/jobAdvertisements/getall").permitAll()
               .requestMatchers("/api/jobAdvertisements/getbyid/{id}").permitAll()
+              .requestMatchers("/api/candidates/**").permitAll()
+              .requestMatchers("/api/auth/signup/candidate").permitAll()
               .anyRequest().authenticated()
         );
     

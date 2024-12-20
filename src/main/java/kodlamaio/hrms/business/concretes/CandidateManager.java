@@ -43,9 +43,11 @@ public class CandidateManager implements CandidateService{
 	@Override
 	public Result add(Candidate candidate) {
 		
+		/*
 		if (this.candidateInfoCheckService.isValidCandidate(candidate).isSuccess()) {
 			
-			//int emailVerificationId = 
+			//verification daha sonra implement edilecek.
+			
 			this.emailVerificationService.generateVerificationEmailForUser(candidate);
 			
 			// Burada aday email doğrulaması yaptı, emailinede gelen linke tıkladı, linkteki random string alındı 
@@ -65,7 +67,9 @@ public class CandidateManager implements CandidateService{
 			 
 		}
 		else return new ErrorResult("Aday eklenemedi");
-
+		*/
+		this.candidateDao.save(candidate);
+		return new SuccessResult("Aday eklendi");
 	}
 
 	@Override

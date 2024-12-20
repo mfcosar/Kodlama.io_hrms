@@ -1,5 +1,6 @@
 package kodlamaio.hrms.entities.concretes;
 
+//import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -71,4 +72,28 @@ public class Candidate extends User{
 
 	@OneToMany(mappedBy = "candidate")
 	private List<Image> images;
+
+	public Candidate(String username, String email, String password,
+			@NotBlank(message = "İsminizi giriniz!") String firstName,
+			@NotBlank(message = "Soyadınızı giriniz!") String lastName,
+			@NotBlank(message = "TC Kimlik Numaranızı giriniz!") String tcIdentityNumber,
+			int birthYear) {
+		super(username, email, password);
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.tcIdentityNumber = tcIdentityNumber;
+		this.birthYear = birthYear;
+	}
+	
+	/*public Candidate(String username, String email, String password, boolean isVerified, LocalDateTime verificationExpiry,
+			@NotBlank(message = "İsminizi giriniz!") String firstName,
+			@NotBlank(message = "Soyadınızı giriniz!") String lastName,
+			@NotBlank(message = "TC Kimlik Numaranızı giriniz!") String tcIdentityNumber,
+			@NotBlank(message = "Doğum yılınızı giriniz!") int birthYear) {
+		super(username, email, password, isVerified,verificationExpiry);
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.tcIdentityNumber = tcIdentityNumber;
+		this.birthYear = birthYear;
+	}*/
 }
