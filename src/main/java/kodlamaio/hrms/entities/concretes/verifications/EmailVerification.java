@@ -11,7 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -29,10 +29,12 @@ public class EmailVerification {
 	@Column(name="code")
 	private String code;
 	
-	@Column(name="is_verified")
-	private boolean isVerified;
+	@Column(name="verified")
+	private boolean verified;
 	
-	@Column(name="verification_date")
-	private Date verificationDate;
+	@Column(name="verification_expiry")
+	private LocalDateTime verificationExpiry;
 
+	
+	
 }

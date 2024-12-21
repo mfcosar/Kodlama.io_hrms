@@ -1,9 +1,20 @@
 package kodlamaio.hrms.business.concretes.verifications;
 
-import java.util.Date;
+
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Properties;
+
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Message; 
+import jakarta.mail.internet.InternetAddress; 
+import jakarta.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import kodlamaio.hrms.business.abstracts.verifications.EmailVerificationService;
@@ -12,21 +23,65 @@ import kodlamaio.hrms.core.utilities.results.ErrorResult;
 import kodlamaio.hrms.core.utilities.results.Result;
 import kodlamaio.hrms.core.utilities.results.SuccessDataResult;
 import kodlamaio.hrms.core.utilities.results.SuccessResult;
+import kodlamaio.hrms.dataAccess.abstracts.verifications.CandidateEmailVerificationDao;
 import kodlamaio.hrms.dataAccess.abstracts.verifications.EmailVerificationDao;
+import kodlamaio.hrms.entities.concretes.Candidate;
 import kodlamaio.hrms.entities.concretes.User;
+import kodlamaio.hrms.entities.concretes.verifications.CandidateEmailVerification;
 import kodlamaio.hrms.entities.concretes.verifications.EmailVerification;
+
 
 
 @Service
 public class EmailVerificationManager implements EmailVerificationService{
 	
 	private EmailVerificationDao emailVerificationDao;
+	private CandidateEmailVerificationDao candidateEmailVerificationDao;
+	
+	@Value("${spring.mail.username}")
+	private String fromEmail;
+	
+	@Value("${spring.mail.password}")
+	private String password;
 
 	
 	@Autowired
-	public EmailVerificationManager(EmailVerificationDao emailVerificationDao) {
+	public EmailVerificationManager(EmailVerificationDao emailVerificationDao, CandidateEmailVerificationDao candidateEmailVerificationDao) {
 		super();
 		this.emailVerificationDao = emailVerificationDao;
+		this.candidateEmailVerificationDao= candidateEmailVerificationDao;
+	}
+	
+	@Override
+	public String sendEmail(String emailTo, String subject, String emailBody) {
+		Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.socketFactory.port", "465");
+        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.prot", "465");
+
+        Session session = Session.getInstance(props, new jakarta.mail.Authenticator() 
+        {
+            protected PasswordAuthentication getPasswordAuthentication() 
+            {
+            	return new PasswordAuthentication(fromEmail, password);
+            }
+        }
+        );
+        
+        try {
+        	Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(fromEmail));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(emailTo));
+            message.setSubject(subject);
+            message.setText(emailBody);
+            Transport.send(message);
+            return "Mail sended.";
+
+        } catch (Exception e) {
+        	throw new RuntimeException(e);
+        }
 	}
 
 	@Override
@@ -36,11 +91,32 @@ public class EmailVerificationManager implements EmailVerificationService{
 	}
 
 	@Override
+	public Result generateVerificationEmailForCandidate(Candidate candidate) {//daha DB'e kaydedilmedi: Result
+	
+		CandidateEmailVerification candidateEmailVerification = new CandidateEmailVerification();
+		String code=generateNewEmailVerificationCode(38);
+		candidateEmailVerification.setCode(code);
+		candidateEmailVerification.setVerified(false);
+		candidateEmailVerification.setVerificationExpiry(LocalDateTime.now().plusHours(48));
+		candidateEmailVerification.setCandidateId(candidate.getId());
+		this.candidateEmailVerificationDao.save(candidateEmailVerification);
+		
+		String verificationLink = "http://localhost:8080/api/verifications/verifyCandidateAccount?token=" + code + "&id=" + candidate.getId();
+		String emailBody = "Please click the link below to verify your account:\n" + verificationLink;
+		sendEmail(candidate.getEmail(), "Account Verification", emailBody);
+		
+		return new SuccessResult("Verification code is sent to user."); 
+	}
+	
+	
+	
+	@Override
 	public Result generateVerificationEmailForUser(User user) {//daha DB'e kaydedilmedi: Result
 	
 		EmailVerification emailVerification = new EmailVerification();
-		emailVerification.setCode(generateNewEmailVerificationCode()+user.getEmail());
+		emailVerification.setCode(generateNewEmailVerificationCode(38));
 		emailVerification.setVerified(false);
+		emailVerification.setVerificationExpiry(LocalDateTime.now().plusHours(48));
 		this.emailVerificationDao.save(emailVerification);
 		
 		sendVerificationEmail(user);
@@ -48,7 +124,13 @@ public class EmailVerificationManager implements EmailVerificationService{
 		return new SuccessResult("Kullanıcıya doğrulama kodu gönderildi."); 
 	}
 	
-
+	private String sendVerificationEmail(User user) {
+		String verificationLink = "http://localhost:8080/api/verifications/verifyAccount?token=" + user.getId();
+		String emailBody = "Please click the link below to verify your account:\n" + verificationLink;
+		return sendEmail(user.getEmail(), "Account Verification", emailBody);
+	}
+	
+	
 	/*@Override
 	 * denendi: DB'de fazladan satır ekliyor emailVerification tablosuna. çözülemedi
 	 * 
@@ -78,7 +160,7 @@ public class EmailVerificationManager implements EmailVerificationService{
 		}
 		EmailVerification emailVerification = this.emailVerificationDao.getReferenceById(emailVerificationId);//getById ==> deprecated
 		emailVerification.setVerified(true);
-		emailVerification.setVerificationDate(new Date());
+		//emailVerification.setVerificationDate(new Date());
 
 		this.emailVerificationDao.save(emailVerification); //emailVerification
 		
@@ -86,17 +168,23 @@ public class EmailVerificationManager implements EmailVerificationService{
 	}
 	
 	
-	private String generateNewEmailVerificationCode() {
+	private String generateNewEmailVerificationCode(int digitCount) {
+		
+		final SecureRandom RANDOM = new SecureRandom();
+		int min = (int) Math.pow(10, digitCount - 1); 
+		int max = (int) Math.pow(10, digitCount) - 1; 
+		int code= RANDOM.nextInt((max - min) + 1) + min;
+		return String.valueOf(code);
 		// new email verification 
 		//String code = "generateRandomCodeHere0123456789" + new Date().hashCode(); //burası random string olacak ama biz simulasyon için sabit kullanıyoruz
-		String code = "generateRandomCodeHere0123456789" ;
-		return code;
+		//String code = "generateRandomCodeHere0123456789" ; return code;
+		
 	}
 	
-	private Result sendVerificationEmail(User user) {
+	/*private Result sendVerificationEmail(User user) {//dummy
 		//send email to User
 		return new SuccessResult("Doğrulama kodu email adresine gönderildi : " + user.getEmail());
-	}
+	}*/
 	
 	@Override
 	public Result checkUserEmailVerification(String code) { 
@@ -111,6 +199,10 @@ public class EmailVerificationManager implements EmailVerificationService{
 
 		return new ErrorResult("Bu kullanıcının email doğrulaması henüz yapılmamış.");
 	}	
+	
+	
+	
+	
 	/*@Override
 	public Result  generateVerificationEmailForCandidate(Candidate candidate) {//daha DB'e kaydedilmedi: Result
 	
@@ -209,5 +301,7 @@ public class EmailVerificationManager implements EmailVerificationService{
 		return new ErrorResult("Bu kullanıcının email doğrulaması henüz yapılmamış.");
 	}
 */
+
+
 
 }

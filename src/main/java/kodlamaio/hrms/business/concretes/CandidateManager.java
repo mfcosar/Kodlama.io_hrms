@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import kodlamaio.hrms.business.abstracts.CandidateService;
-import kodlamaio.hrms.business.abstracts.validations.CandidateInfoCheckService;
+//import kodlamaio.hrms.business.abstracts.validations.CandidateInfoCheckService;
 import kodlamaio.hrms.business.abstracts.verifications.EmailVerificationService;
 import kodlamaio.hrms.core.utilities.results.DataResult;
 import kodlamaio.hrms.core.utilities.results.ErrorResult;
@@ -21,15 +21,14 @@ import kodlamaio.hrms.entities.concretes.Candidate;
 public class CandidateManager implements CandidateService{
 	
 	private CandidateDao candidateDao;
-	private CandidateInfoCheckService candidateInfoCheckService;
+	//private CandidateInfoCheckService candidateInfoCheckService;
 	private EmailVerificationService emailVerificationService;
 	private UserDao userDao;
 
 	@Autowired
-	public CandidateManager(CandidateDao candidateDao, UserDao userDao, CandidateInfoCheckService candidateInfoCheckService, EmailVerificationService emailVerificationService) {
+	public CandidateManager(CandidateDao candidateDao, UserDao userDao, EmailVerificationService emailVerificationService) {
 		super();
 		this.candidateDao = candidateDao;
-		this.candidateInfoCheckService = candidateInfoCheckService;
 		this.emailVerificationService = emailVerificationService;
 		this.userDao = userDao;
 	}
@@ -43,7 +42,23 @@ public class CandidateManager implements CandidateService{
 	@Override
 	public Result add(Candidate candidate) {
 		
-		/*
+		if (userDao.existsByUsername(candidate.getUsername())) {
+			return new ErrorResult("Username is already registered.");
+		}
+		
+		if (userDao.existsByEmail(candidate.getEmail())) {
+			return new ErrorResult("Email is already registered.");
+		}		
+		
+		if (candidateDao.existsByTcIdentityNumber(candidate.getTcIdentityNumber())) {
+			return new ErrorResult("Tc Identity Number is already registered.");
+		}	
+		
+		emailVerificationService.generateVerificationEmailForCandidate(candidate);
+		this.candidateDao.save(candidate);
+
+		return new SuccessResult("You are registered successfully.\n Please check your email to verify your account in 48 hours.");
+/*
 		if (this.candidateInfoCheckService.isValidCandidate(candidate).isSuccess()) {
 			
 			//verification daha sonra implement edilecek.
@@ -68,9 +83,16 @@ public class CandidateManager implements CandidateService{
 		}
 		else return new ErrorResult("Aday eklenemedi");
 		*/
-		this.candidateDao.save(candidate);
-		return new SuccessResult("Aday eklendi");
+		//this.candidateDao.save(candidate);
+		//return new SuccessResult("Aday eklendi");
 	}
+	
+	/*private String sendVerificationEmail(Candidate candidate) {
+		String verificationLink = "http://localhost:8080/api/verifications/verifyAccount?token=" + candidate.getId();
+		String emailBody = "Please click the link below to verify your account:\n" + verificationLink;
+		return emailVerificationService.sendEmail(candidate.getEmail(), "Account Verification", emailBody);
+	}*/
+	
 
 	@Override
 	public DataResult<Candidate> findCandidateById(int candidateId) {

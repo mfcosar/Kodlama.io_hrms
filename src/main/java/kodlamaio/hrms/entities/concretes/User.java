@@ -62,7 +62,10 @@ public class User {
 	      inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles = new HashSet<>();
 
-	//private boolean verified;	private LocalDateTime verificationExpiry;
+	@Column(name="verified")
+	private boolean verified;	
+	
+	/*private LocalDateTime verificationExpiry;*/
 
 	  public User(String username, String email, String password) {
 	    this.username = username;
