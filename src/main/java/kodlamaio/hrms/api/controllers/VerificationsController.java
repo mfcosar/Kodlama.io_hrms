@@ -21,14 +21,14 @@ import kodlamaio.hrms.entities.concretes.verifications.CandidateEmailVerificatio
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/verifications")
-public class EmailVerificationsController {
+public class VerificationsController {
 	
 	@Autowired
 	private UserDao userDao;
 	private CandidateEmailVerificationDao candidateEmailVerificationDao;
 
 	@GetMapping("/verifyCandidateAccount")
-	public Result verifyAccount(@RequestParam("token") String code, @RequestParam("id") int candidateId) {
+	public Result verifyAccount(@RequestParam("token") String code, @RequestParam("candidateId") int candidateId) {
 		/*Optional<User> optionalUser = userDao.findById(candidateId);
 		if (optionalUser.isPresent()) {
 			User user = optionalUser.get();*/

@@ -93,17 +93,14 @@ public class EmailVerificationManager implements EmailVerificationService{
 	@Override
 	public Result generateVerificationEmailForCandidate(Candidate candidate) {//daha DB'e kaydedilmedi: Result
 	
-		CandidateEmailVerification candidateEmailVerification = new CandidateEmailVerification();
-		String code=generateNewEmailVerificationCode(38);
-		candidateEmailVerification.setCode(code);
-		candidateEmailVerification.setVerified(false);
-		candidateEmailVerification.setVerificationExpiry(LocalDateTime.now().plusHours(48));
-		candidateEmailVerification.setCandidateId(candidate.getId());
+		String code=generateNewEmailVerificationCode(25); //db'de 38 digit ama bu çok zorladı , 25 e cekildi
+		CandidateEmailVerification candidateEmailVerification = 
+				new CandidateEmailVerification(code, false, LocalDateTime.now().plusHours(48), candidate.getId());
 		this.candidateEmailVerificationDao.save(candidateEmailVerification);
 		
-		String verificationLink = "http://localhost:8080/api/verifications/verifyCandidateAccount?token=" + code + "&id=" + candidate.getId();
+		String verificationLink = "http://localhost:8080/api/verifications/verifyCandidateAccount?token=" + code + "&candidateId=" + candidate.getId();
 		String emailBody = "Please click the link below to verify your account:\n" + verificationLink;
-		sendEmail(candidate.getEmail(), "Account Verification", emailBody);
+		//sendEmail(candidate.getEmail(), "Account Verification", emailBody); //gamil app specific password istediği için hata verdi
 		
 		return new SuccessResult("Verification code is sent to user."); 
 	}
@@ -169,12 +166,17 @@ public class EmailVerificationManager implements EmailVerificationService{
 	
 	
 	private String generateNewEmailVerificationCode(int digitCount) {
-		
+	
 		final SecureRandom RANDOM = new SecureRandom();
-		int min = (int) Math.pow(10, digitCount - 1); 
-		int max = (int) Math.pow(10, digitCount) - 1; 
-		int code= RANDOM.nextInt((max - min) + 1) + min;
-		return String.valueOf(code);
+		double min = (double) Math.pow(10, digitCount - 1); 
+		double max = (double) Math.pow(10, digitCount) - 1; 
+		double bound= (max - min) + 1;
+		if (bound <= 0) { 
+			throw new IllegalArgumentException("Bound must be positive"); 
+		} else {
+			double code= RANDOM.nextDouble(bound) + min;
+			return String.valueOf(code);
+		}
 		// new email verification 
 		//String code = "generateRandomCodeHere0123456789" + new Date().hashCode(); //burası random string olacak ama biz simulasyon için sabit kullanıyoruz
 		//String code = "generateRandomCodeHere0123456789" ; return code;

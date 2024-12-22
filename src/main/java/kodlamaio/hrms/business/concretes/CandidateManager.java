@@ -54,8 +54,8 @@ public class CandidateManager implements CandidateService{
 			return new ErrorResult("Tc Identity Number is already registered.");
 		}	
 		
+		this.candidateDao.save(candidate); //candidateId olmadan generate cagrılırsa db hata veriyor
 		emailVerificationService.generateVerificationEmailForCandidate(candidate);
-		this.candidateDao.save(candidate);
 
 		return new SuccessResult("You are registered successfully.\n Please check your email to verify your account in 48 hours.");
 /*

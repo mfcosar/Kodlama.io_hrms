@@ -35,6 +35,13 @@ public class EmailVerification {
 	@Column(name="verification_expiry")
 	private LocalDateTime verificationExpiry;
 
+	public EmailVerification(String code, boolean verified, LocalDateTime verificationExpiry) {
+		super();
+		this.code = code;
+		this.verified = verified;
+		this.verificationExpiry = verificationExpiry;
+	}
+
 	
 	
 }

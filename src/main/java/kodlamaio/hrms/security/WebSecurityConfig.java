@@ -79,6 +79,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
               .requestMatchers("/api/jobAdvertisements/getbyid/{id}").permitAll()
               .requestMatchers("/api/candidates/**").permitAll()
               .requestMatchers("/api/auth/signup/candidate").permitAll()
+              .requestMatchers("/api/verifications/verifyCandidateAccount").permitAll()
               .anyRequest().authenticated()
         );
     
