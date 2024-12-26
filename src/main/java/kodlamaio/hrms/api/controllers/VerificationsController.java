@@ -26,12 +26,19 @@ public class VerificationsController {
 	@Autowired
 	private UserDao userDao;
 	private CandidateEmailVerificationDao candidateEmailVerificationDao;
+	
+	
+	@Autowired
+	public VerificationsController(UserDao userDao, CandidateEmailVerificationDao candidateEmailVerificationDao) {
+		super();
+		this.userDao = userDao;
+		this.candidateEmailVerificationDao = candidateEmailVerificationDao;
+	}
+
+
 
 	@GetMapping("/verifyCandidateAccount")
 	public Result verifyAccount(@RequestParam("token") String code, @RequestParam("candidateId") int candidateId) {
-		/*Optional<User> optionalUser = userDao.findById(candidateId);
-		if (optionalUser.isPresent()) {
-			User user = optionalUser.get();*/
 			
 			Optional<CandidateEmailVerification> optCandidateEmailVerification=candidateEmailVerificationDao.findByCode(code);
 			if (optCandidateEmailVerification.isPresent()) {
@@ -47,8 +54,11 @@ public class VerificationsController {
 							if (optionalUser.isPresent()) {
 								User user = optionalUser.get();
 								user.setVerified(true);
-								}
-							return new SuccessResult("Your account has been successfully verified.");
+								userDao.save(user);							
+								return new SuccessResult("Your account has been successfully verified.");
+							}else 
+								return new ErrorResult("User verification is not complete!");
+							
 						} else {
 							return new ErrorResult("The verification link has expired!");
 						}

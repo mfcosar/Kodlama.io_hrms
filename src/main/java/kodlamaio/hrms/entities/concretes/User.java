@@ -63,7 +63,7 @@ public class User {
 	private Set<Role> roles = new HashSet<>();
 
 	@Column(name="verified")
-	private Boolean verified; //primitive type boolean hata veriyor	
+	private Boolean verified; //primitive type boolean hata veriyor	??
 	
 	/*private LocalDateTime verificationExpiry;*/
 
@@ -73,16 +73,16 @@ public class User {
 	    this.password = password;
 	  }
 	  
-		/*public User(@NotBlank @NotNull String username,
+		public User(@NotBlank @NotNull String username,
 				@Email @NotBlank(message = "Lütfen email adresinizi giriniz!") @NotNull String email,
-				@NotBlank(message = "Lütfen şifrenizi giriniz!") @NotNull String password) {//, boolean verified,
-			LocalDateTime verificationExpiry
+				@NotBlank(message = "Lütfen şifrenizi giriniz!") @NotNull String password, boolean verified) {//, LocalDateTime verificationExpiry
+			
 			super();
 			this.username = username;
 			this.email = email;
 			this.password = password;
-			//this.verified = verified; this.verificationExpiry = verificationExpiry;
-		}*/
+			this.verified = verified; //this.verificationExpiry = verificationExpiry;
+		}
 	  
 
 	  public int getId() {
@@ -126,7 +126,13 @@ public class User {
 	  }
 
 
+	  public Boolean isVerified() {
+		    return verified;
+	  }
 
+	  public void setVerified(Boolean verified) {
+		    this.verified = verified;
+	  }
 
 
 	}

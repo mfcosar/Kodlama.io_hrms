@@ -93,7 +93,7 @@ public class EmailVerificationManager implements EmailVerificationService{
 	@Override
 	public Result generateVerificationEmailForCandidate(Candidate candidate) {//daha DB'e kaydedilmedi: Result
 	
-		String code=generateNewEmailVerificationCode(25); //db'de 38 digit ama bu çok zorladı , 25 e cekildi
+		String code=generateNewEmailVerificationCode(38); //db'de 38 digit ama bu çok zorladı , 25 e cekildi
 		CandidateEmailVerification candidateEmailVerification = 
 				new CandidateEmailVerification(code, false, LocalDateTime.now().plusHours(48), candidate.getId());
 		this.candidateEmailVerificationDao.save(candidateEmailVerification);
@@ -117,7 +117,7 @@ public class EmailVerificationManager implements EmailVerificationService{
 		this.emailVerificationDao.save(emailVerification);
 		
 		sendVerificationEmail(user);
-		//return emailVerification.getId();
+		
 		return new SuccessResult("Kullanıcıya doğrulama kodu gönderildi."); 
 	}
 	
@@ -127,25 +127,7 @@ public class EmailVerificationManager implements EmailVerificationService{
 		return sendEmail(user.getEmail(), "Account Verification", emailBody);
 	}
 	
-	
-	/*@Override
-	 * denendi: DB'de fazladan satır ekliyor emailVerification tablosuna. çözülemedi
-	 * 
-	public Result addCandidateEmailVerification(int emailVerificationId, int candidateId) {
-		CandidateEmailVerification candidateEmailVerification = this.candidateEmailVerificationDao.getReferenceById(emailVerificationId);
-		candidateEmailVerification.setCandidateId(candidateId);
-		this.candidateEmailVerificationDao.save(candidateEmailVerification);
-		return new SuccessResult("Aday email doğrulaması kaydı tamamlandı.");
-	}
-	
-	@Override
-	public Result addEmployerEmailVerification(int emailVerificationId, int employerId) {
-		EmployerEmailVerification employerEmailVerification = new EmployerEmailVerification();
-		employerEmailVerification.setId(emailVerificationId);
-		employerEmailVerification.setEmployerId(employerId);
-		this.employerEmailVerificationDao.save(employerEmailVerification);
-		return new SuccessResult("İş veren email doğrulaması kaydı tamamlandı.");
-	}*/
+
 	
 	@Override
 	public Result setUserVerificationCompleted(String code) {
@@ -164,29 +146,18 @@ public class EmailVerificationManager implements EmailVerificationService{
 		return new SuccessResult("Email doğrulaması tamamlandı.");
 	}
 	
-	
-	private String generateNewEmailVerificationCode(int digitCount) {
-	
-		final SecureRandom RANDOM = new SecureRandom();
-		double min = (double) Math.pow(10, digitCount - 1); 
-		double max = (double) Math.pow(10, digitCount) - 1; 
-		double bound= (max - min) + 1;
-		if (bound <= 0) { 
-			throw new IllegalArgumentException("Bound must be positive"); 
-		} else {
-			double code= RANDOM.nextDouble(bound) + min;
-			return String.valueOf(code);
-		}
-		// new email verification 
-		//String code = "generateRandomCodeHere0123456789" + new Date().hashCode(); //burası random string olacak ama biz simulasyon için sabit kullanıyoruz
-		//String code = "generateRandomCodeHere0123456789" ; return code;
+
+	private String generateNewEmailVerificationCode(int charCount) {
 		
+		final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; 
+		final SecureRandom RANDOM = new SecureRandom();
+		StringBuilder sb = new StringBuilder(charCount); 
+		for (int i = 0; i < charCount; i++) { 
+			sb.append(CHARACTERS.charAt(RANDOM.nextInt(CHARACTERS.length()))); 
+			} 
+		return sb.toString();
 	}
-	
-	/*private Result sendVerificationEmail(User user) {//dummy
-		//send email to User
-		return new SuccessResult("Doğrulama kodu email adresine gönderildi : " + user.getEmail());
-	}*/
+
 	
 	@Override
 	public Result checkUserEmailVerification(String code) { 
@@ -218,9 +189,6 @@ public class EmailVerificationManager implements EmailVerificationService{
 		return new SuccessResult("Adaya doğrulama kodu gönderildi."); //candidateEmailVerification.getId();//
 	}
 	
-
-
-
 	@Override
 	public Result setCandidateVerificationCompleted(String code) {
 		int emailVerificationId=0;
@@ -303,7 +271,5 @@ public class EmailVerificationManager implements EmailVerificationService{
 		return new ErrorResult("Bu kullanıcının email doğrulaması henüz yapılmamış.");
 	}
 */
-
-
 
 }

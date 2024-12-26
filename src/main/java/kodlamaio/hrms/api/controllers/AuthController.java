@@ -1,6 +1,8 @@
 package kodlamaio.hrms.api.controllers;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -12,8 +14,12 @@ import kodlamaio.hrms.core.entities.Role;
 import kodlamaio.hrms.dataAccess.abstracts.CandidateDao;
 import kodlamaio.hrms.dataAccess.abstracts.RoleDao;
 import kodlamaio.hrms.dataAccess.abstracts.UserDao;
+import kodlamaio.hrms.dataAccess.abstracts.verifications.CandidateEmailVerificationDao;
+import kodlamaio.hrms.dataAccess.abstracts.verifications.EmailVerificationDao;
+import kodlamaio.hrms.dataAccess.abstracts.verifications.EmployerEmailVerificationDao;
 import kodlamaio.hrms.entities.concretes.Candidate;
 import kodlamaio.hrms.entities.concretes.User;
+import kodlamaio.hrms.entities.concretes.verifications.CandidateEmailVerification;
 import kodlamaio.hrms.payload.request.LoginRequest;
 import kodlamaio.hrms.payload.request.SignupCandidateRequest;
 import kodlamaio.hrms.payload.request.SignupRequest;
@@ -68,10 +74,65 @@ public class AuthController {
   
   @Autowired
   RefreshTokenService refreshTokenService;
+  
+  @Autowired
+  CandidateEmailVerificationDao candidateEmailVerificationDao;
+  
+  @Autowired
+  EmployerEmailVerificationDao employerEmailVerificationDao;
+  
+  @Autowired
+  EmailVerificationDao emailVerificationDao;
+  
 
   @PostMapping("/signin")
   public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+	  
+	  //verification check yapılır, olumsuz ise user bütün db'den silinir
+	  String username= loginRequest.getUsername();
+	  Optional<User> optUser;
+	  
+	  optUser = userRepository.findByUsername(username);
+	  if (optUser.isPresent()) {
+		  User user = optUser.get();
+		  if (!user.getVerified()) {
+			  //check if verification link has expired
+			  
+			  //bütün verifications'u bir tek emailverificationsa da topla çok dallandırma..
+			  
+			  Optional<CandidateEmailVerification> optCandidateEmailVerification= candidateEmailVerificationDao.findByCandidateId(user.getId());
+			  if (optCandidateEmailVerification.isPresent()) {
+				  CandidateEmailVerification candidateEmailVerification= optCandidateEmailVerification.get();
+				  if (candidateEmailVerification.getVerificationExpiry().isBefore(LocalDateTime.now())) {
+					  //expired: delete user from all db tables
+					  //userRolesDao.deleteById(user.getId());
+					  user.setRoles(null); //burda UserRolesDao lazım mı??
+					  //find verification record & delete
+					  int verificationId = candidateEmailVerification.getId();
+					  int candidateId = candidateEmailVerification.getCandidateId();
+					  candidateEmailVerificationDao.deleteById(verificationId);
+					  emailVerificationDao.deleteById(verificationId);
+					  candidateRepository.deleteById(candidateId);
+					  userRepository.deleteById(user.getId());
+					  //silinecekler var candidateDao/employerDao' dan sil.. 
+					  
+					  return ResponseEntity
+					          .badRequest()
+					          .body(new MessageResponse("Verification link has expired. Please sign up again!"));
+				  }
+				  else return ResponseEntity
+				          .badRequest()
+				          .body(new MessageResponse("User account is not verified yet! Please check your email box to verify your HRMS account."));
+			  }
 
+		  }
+	  }else {
+		  return ResponseEntity
+		          .badRequest()
+		          .body(new MessageResponse("Invalid username!"));
+	  }
+	  
+	//user verified ise aşağıdaki kod ile authentication yapılır	 
     Authentication authentication = authenticationManager
         .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 

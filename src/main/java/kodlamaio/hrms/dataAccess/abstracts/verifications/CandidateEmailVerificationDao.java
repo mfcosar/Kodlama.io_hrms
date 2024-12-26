@@ -11,5 +11,6 @@ import kodlamaio.hrms.entities.concretes.verifications.CandidateEmailVerificatio
 public interface CandidateEmailVerificationDao extends JpaRepository<CandidateEmailVerification, Integer> {
 	
 	Optional<CandidateEmailVerification> findByCode(String code);
+	Optional<CandidateEmailVerification> findByCandidateId(int candidateId);
 
 }
