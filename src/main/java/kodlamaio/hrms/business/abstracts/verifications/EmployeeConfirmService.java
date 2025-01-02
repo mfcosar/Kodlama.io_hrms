@@ -6,9 +6,9 @@ import kodlamaio.hrms.entities.concretes.Employer;
 
 public interface EmployeeConfirmService {
 
-	int generateEmployeeConfirmation(Employer employer);//Result generateEmployeeConfirmation(Employer employer);
-	Result confirmEmployer(int confirmationId, Employer employer, int employeeId);
-	Result checkEmployeeConfirmation(int confirmationId);//id'si henüz yok
+	Result generateEmployeeConfirmation(Employer employer);//Result generateEmployeeConfirmation(Employer employer);
+	//Result confirmEmployer(int confirmationId, Employer employer, int employeeId);
+	//Result checkEmployeeConfirmation(int confirmationId);//id'si henüz yok
 	
 }
 

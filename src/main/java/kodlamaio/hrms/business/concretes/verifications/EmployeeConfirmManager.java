@@ -1,44 +1,43 @@
 package kodlamaio.hrms.business.concretes.verifications;
 
-import java.util.Date;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import kodlamaio.hrms.business.abstracts.verifications.EmployeeConfirmService;
-import kodlamaio.hrms.core.utilities.results.ErrorResult;
 import kodlamaio.hrms.core.utilities.results.Result;
 import kodlamaio.hrms.core.utilities.results.SuccessResult;
-import kodlamaio.hrms.dataAccess.abstracts.verifications.EmployeeConfirmDao;
+import kodlamaio.hrms.dataAccess.abstracts.verifications.EmployeeConfirmEmployerDao;
 import kodlamaio.hrms.entities.concretes.Employer;
-import kodlamaio.hrms.entities.concretes.verifications.EmployeeConfirm;
+import kodlamaio.hrms.entities.concretes.verifications.EmployeeConfirmEmployer;
 
 @Service
 public class EmployeeConfirmManager implements EmployeeConfirmService{
 	
-	private EmployeeConfirmDao employeeConfirmDao;
+	private EmployeeConfirmEmployerDao employeeConfirmEmployerDao;
 	
 	
 	@Autowired
-	public EmployeeConfirmManager(EmployeeConfirmDao employeeConfirmDao) {
+	public EmployeeConfirmManager(EmployeeConfirmEmployerDao employeeConfirmEmployerDao) {
 		super();
-		this.employeeConfirmDao = employeeConfirmDao;
+		this.employeeConfirmEmployerDao = employeeConfirmEmployerDao;
 		}
 
 	@Override
-	public int generateEmployeeConfirmation(Employer employer) {
+	public Result generateEmployeeConfirmation(Employer employer) {
 		
-		EmployeeConfirm employeeConfirm = new EmployeeConfirm();
-		employeeConfirm.setEmployeeId(1);//default, fk olduğu için zorunlu girildi
-		employeeConfirm.setConfirmed(false);
-		this.employeeConfirmDao.save(employeeConfirm);
+		EmployeeConfirmEmployer employeeConfirmEmployer = new EmployeeConfirmEmployer();
+		
+		employeeConfirmEmployer.setEmployerId(employer.getId());
+		employeeConfirmEmployer.setIsConfirmed(false);
+		
+    	this.employeeConfirmEmployerDao.save(employeeConfirmEmployer);
 		
 		//display in system and wait for personnel to check employer
-		return employeeConfirm.getId();
-		//return new SuccessResult("İş vereni onaylama talebi oluşturuldu");
+		//return employeeConfirmEmployer.getId();
+		return new SuccessResult("İş vereni onaylama talebi oluşturuldu");
 	
 	}
-
+/*
 	@Override
 	public Result confirmEmployer(int confirmationId, Employer employer, int employeeId) {
 	
@@ -62,6 +61,6 @@ public class EmployeeConfirmManager implements EmployeeConfirmService{
 		else 
 			return new ErrorResult("Bu iş verenin HRMS personeli tarafından doğrulaması henüz yapılmamış.");
 			
-	}
+	}*/
 
 }

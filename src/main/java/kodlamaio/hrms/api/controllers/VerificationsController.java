@@ -13,10 +13,16 @@ import org.springframework.web.bind.annotation.RestController;
 import kodlamaio.hrms.core.utilities.results.ErrorResult;
 import kodlamaio.hrms.core.utilities.results.Result;
 import kodlamaio.hrms.core.utilities.results.SuccessResult;
+import kodlamaio.hrms.dataAccess.abstracts.EmployerDao;
 import kodlamaio.hrms.dataAccess.abstracts.UserDao;
 import kodlamaio.hrms.dataAccess.abstracts.verifications.CandidateEmailVerificationDao;
+import kodlamaio.hrms.dataAccess.abstracts.verifications.EmployeeConfirmEmployerDao;
+import kodlamaio.hrms.dataAccess.abstracts.verifications.EmployerEmailVerificationDao;
+import kodlamaio.hrms.entities.concretes.Employer;
 import kodlamaio.hrms.entities.concretes.User;
 import kodlamaio.hrms.entities.concretes.verifications.CandidateEmailVerification;
+import kodlamaio.hrms.entities.concretes.verifications.EmployeeConfirmEmployer;
+import kodlamaio.hrms.entities.concretes.verifications.EmployerEmailVerification;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -26,19 +32,25 @@ public class VerificationsController {
 	@Autowired
 	private UserDao userDao;
 	private CandidateEmailVerificationDao candidateEmailVerificationDao;
+	private EmployerEmailVerificationDao employerEmailVerificationDao;
+	private EmployeeConfirmEmployerDao employeeConfirmEmployerDao;
+	private EmployerDao employerDao;
 	
 	
 	@Autowired
-	public VerificationsController(UserDao userDao, CandidateEmailVerificationDao candidateEmailVerificationDao) {
+	public VerificationsController(UserDao userDao, CandidateEmailVerificationDao candidateEmailVerificationDao,
+			EmployerEmailVerificationDao employerEmailVerificationDao, EmployeeConfirmEmployerDao employeeConfirmEmployerDao) {
 		super();
 		this.userDao = userDao;
 		this.candidateEmailVerificationDao = candidateEmailVerificationDao;
+		this.employerEmailVerificationDao = employerEmailVerificationDao;
+		this.employeeConfirmEmployerDao = employeeConfirmEmployerDao;
 	}
 
 
 
 	@GetMapping("/verifyCandidateAccount")
-	public Result verifyAccount(@RequestParam("token") String code, @RequestParam("candidateId") int candidateId) {
+	public Result verifyCandidateAccount(@RequestParam("token") String code, @RequestParam("candidateId") int candidateId) {
 			
 			Optional<CandidateEmailVerification> optCandidateEmailVerification=candidateEmailVerificationDao.findByCode(code);
 			if (optCandidateEmailVerification.isPresent()) {
@@ -70,6 +82,73 @@ public class VerificationsController {
 				else {return new ErrorResult("Verification data is incorrect");}
 		}
 		return new ErrorResult("Verification failed!"); //code isnt in db
+	}
+	
+	@GetMapping("/verifyEmployerAccount")
+	public Result verifyEmployerAccount(@RequestParam("token") String code, @RequestParam("employerId") int employerId) {
+			
+			Optional<EmployerEmailVerification> optEmployerEmailVerification=employerEmailVerificationDao.findByCode(code);
+			if (optEmployerEmailVerification.isPresent()) {
+				EmployerEmailVerification employerEmailVerification=optEmployerEmailVerification.get();
+				if (employerEmailVerification.getEmployerId()==employerId) {
+					if (!employerEmailVerification.isVerified() ) {
+		
+						if (employerEmailVerification.getVerificationExpiry().isAfter(LocalDateTime.now())) {
+							employerEmailVerification.setVerified(true);
+							employerEmailVerificationDao.save(employerEmailVerification);
+							
+							Optional<User> optionalUser = userDao.findById(employerId);
+							if (optionalUser.isPresent()) {
+								User user = optionalUser.get();
+								user.setVerified(true);
+								userDao.save(user);							
+								return new SuccessResult("Your account has been successfully verified.");
+							}else 
+								return new ErrorResult("User verification is not complete!");
+							
+						} else {
+							return new ErrorResult("The verification link has expired!");
+						}
+					}
+					else {
+						return new ErrorResult("Your account has already been verified.");
+					}
+				}
+				else {return new ErrorResult("Verification data is incorrect");}
+		}
+		return new ErrorResult("Verification failed!"); //code isnt in db
+	}
+	
+	@GetMapping("/employeeConfirmEmployer")
+	public Result employeeConfirmEmployerAccount(@RequestParam("employeeId") int employeeId, @RequestParam("employerId") int employerId) {
+			
+		Optional<EmployeeConfirmEmployer> optEmployeeConfirmEmployer=employeeConfirmEmployerDao.findByEmployerId(employerId);
+		if (optEmployeeConfirmEmployer.isPresent()) {
+			EmployeeConfirmEmployer employeeConfirmEmployer= optEmployeeConfirmEmployer.get();
+			
+			if (employeeConfirmEmployer.getIsConfirmed()) {
+				return new ErrorResult("Employer confirmation has already been done!");
+			} 
+			else {
+				employeeConfirmEmployer.setEmployeeId(employeeId); //burda hata vermedi??
+				employeeConfirmEmployer.setIsConfirmed(true);
+				employeeConfirmEmployer.setConfirmDate(LocalDateTime.now());
+				employeeConfirmEmployerDao.save(employeeConfirmEmployer);
+				
+				//find the employer and set it as employeeConfirmed
+				Optional<Employer> optionalEmployer = employerDao.findById(employerId);
+				if (optionalEmployer.isPresent()) {
+					Employer employer = optionalEmployer.get();
+					employer.setEmployeeConfirmed(true);
+					employerDao.save(employer);							
+					return new SuccessResult("Employer confirmation is completed!");
+				}else 
+					return new ErrorResult("Employer confirmation is not complete!");
+			}
+			
+		 } 
+		else 
+			return new ErrorResult("Confirmation record for this employer is missing!");
 	}
 
 }

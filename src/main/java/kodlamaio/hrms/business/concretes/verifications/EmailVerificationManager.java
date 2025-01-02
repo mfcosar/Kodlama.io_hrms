@@ -25,10 +25,13 @@ import kodlamaio.hrms.core.utilities.results.SuccessDataResult;
 import kodlamaio.hrms.core.utilities.results.SuccessResult;
 import kodlamaio.hrms.dataAccess.abstracts.verifications.CandidateEmailVerificationDao;
 import kodlamaio.hrms.dataAccess.abstracts.verifications.EmailVerificationDao;
+import kodlamaio.hrms.dataAccess.abstracts.verifications.EmployerEmailVerificationDao;
 import kodlamaio.hrms.entities.concretes.Candidate;
+import kodlamaio.hrms.entities.concretes.Employer;
 import kodlamaio.hrms.entities.concretes.User;
 import kodlamaio.hrms.entities.concretes.verifications.CandidateEmailVerification;
 import kodlamaio.hrms.entities.concretes.verifications.EmailVerification;
+import kodlamaio.hrms.entities.concretes.verifications.EmployerEmailVerification;
 
 
 
@@ -37,6 +40,7 @@ public class EmailVerificationManager implements EmailVerificationService{
 	
 	private EmailVerificationDao emailVerificationDao;
 	private CandidateEmailVerificationDao candidateEmailVerificationDao;
+	private EmployerEmailVerificationDao employerEmailVerificationDao;
 	
 	@Value("${spring.mail.username}")
 	private String fromEmail;
@@ -46,10 +50,12 @@ public class EmailVerificationManager implements EmailVerificationService{
 
 	
 	@Autowired
-	public EmailVerificationManager(EmailVerificationDao emailVerificationDao, CandidateEmailVerificationDao candidateEmailVerificationDao) {
+	public EmailVerificationManager(EmailVerificationDao emailVerificationDao, CandidateEmailVerificationDao candidateEmailVerificationDao,
+			EmployerEmailVerificationDao employerEmailVerificationDao) {
 		super();
 		this.emailVerificationDao = emailVerificationDao;
 		this.candidateEmailVerificationDao= candidateEmailVerificationDao;
+		this.employerEmailVerificationDao = employerEmailVerificationDao;
 	}
 	
 	@Override
@@ -93,7 +99,7 @@ public class EmailVerificationManager implements EmailVerificationService{
 	@Override
 	public Result generateVerificationEmailForCandidate(Candidate candidate) {//daha DB'e kaydedilmedi: Result
 	
-		String code=generateNewEmailVerificationCode(38); //db'de 38 digit ama bu çok zorladı , 25 e cekildi
+		String code=generateNewEmailVerificationCode(38); //db'de 38 digit ama bu çok zorladı 
 		CandidateEmailVerification candidateEmailVerification = 
 				new CandidateEmailVerification(code, false, LocalDateTime.now().plusHours(48), candidate.getId());
 		this.candidateEmailVerificationDao.save(candidateEmailVerification);
@@ -171,6 +177,21 @@ public class EmailVerificationManager implements EmailVerificationService{
 		}
 
 		return new ErrorResult("Bu kullanıcının email doğrulaması henüz yapılmamış.");
+	}
+
+	@Override
+	public Result generateVerificationEmailForEmployer(Employer employer) {
+		
+		String code=generateNewEmailVerificationCode(38); //db'de 38 digit ama bu çok zorladı 
+		EmployerEmailVerification employerEmailVerification = 
+				new EmployerEmailVerification(code, false, LocalDateTime.now().plusHours(48), employer.getId());
+		this.employerEmailVerificationDao.save(employerEmailVerification);
+		
+		String verificationLink = "http://localhost:8080/api/verifications/verifyEmployerAccount?token=" + code + "&employerId=" + employer.getId();
+		String emailBody = "Please click the link below to verify your account:\n" + verificationLink;
+		//sendEmail(candidate.getEmail(), "Account Verification", emailBody); //gamil app specific password istediği için hata verdi
+		
+		return new SuccessResult("Verification code is sent to user."); 
 	}	
 	
 	

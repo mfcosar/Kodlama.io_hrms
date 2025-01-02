@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import kodlamaio.hrms.core.utilities.results.DataResult;
 import kodlamaio.hrms.core.utilities.results.Result;
 import kodlamaio.hrms.entities.concretes.Candidate;
+import kodlamaio.hrms.entities.concretes.Employer;
 import kodlamaio.hrms.entities.concretes.User;
 import kodlamaio.hrms.entities.concretes.verifications.EmailVerification;
 
@@ -19,6 +20,7 @@ public interface EmailVerificationService {
 	Result checkUserEmailVerification(String code);
 	String sendEmail(String email, String subject, String emailBody);
 	Result generateVerificationEmailForCandidate(Candidate candidate);
+	Result generateVerificationEmailForEmployer(Employer employer);
 	//Result addCandidateEmailVerification(int emailVerificationId, int candidateId);
 	//Result addEmployerEmailVerification(int emailVerificationId, int employerId);
 	/*	Result generateVerificationEmailForCandidate(Candidate candidate);

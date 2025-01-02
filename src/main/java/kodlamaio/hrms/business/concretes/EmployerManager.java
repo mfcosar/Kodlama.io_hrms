@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import kodlamaio.hrms.business.abstracts.EmployerService;
-import kodlamaio.hrms.business.abstracts.validations.EmployerInfoCheckService;
 import kodlamaio.hrms.business.abstracts.verifications.EmailVerificationService;
 import kodlamaio.hrms.business.abstracts.verifications.EmployeeConfirmService;
 import kodlamaio.hrms.core.utilities.results.DataResult;
@@ -24,18 +23,20 @@ public class EmployerManager implements EmployerService{
 
 	private EmployerDao employerDao;
 	private EmailVerificationService emailVerificationService;
+	
 	private EmployeeConfirmService employeeConfirmService;
-	private EmployerInfoCheckService employerInfoCheckService;
+//	private EmployerInfoCheckService employerInfoCheckService;
 	private UserDao userDao;
 	
 	@Autowired
 	public EmployerManager(EmployerDao employerDao, EmailVerificationService emailVerificationService,
-			EmployeeConfirmService employeeConfirmService, EmployerInfoCheckService employerInfoCheckService, UserDao userDao) {
+			EmployeeConfirmService employeeConfirmService, //EmployerInfoCheckService employerInfoCheckService, 
+			UserDao userDao) {
 		super();
 		this.employerDao = employerDao;
 		this.emailVerificationService = emailVerificationService;
 		this.employeeConfirmService = employeeConfirmService;
-		this.employerInfoCheckService = employerInfoCheckService;
+		//this.employerInfoCheckService = employerInfoCheckService;
 		this.userDao = userDao;
 	}
 
@@ -46,6 +47,25 @@ public class EmployerManager implements EmployerService{
 	}
 
 	@Override
+	public Result add(Employer employer) {
+		if (userDao.existsByUsername(employer.getUsername())) {
+			return new ErrorResult("Username is already registered.");
+		}
+		
+		if (userDao.existsByEmail(employer.getEmail())) {
+			return new ErrorResult("Email is already registered.");
+		}
+		
+		this.employerDao.save(employer); //candidateId olmadan generate cagrılırsa db hata veriyor
+		emailVerificationService.generateVerificationEmailForEmployer(employer);
+		employeeConfirmService.generateEmployeeConfirmation(employer);  //2 basamaklı confirm oldugu için
+
+		return new SuccessResult("You are registered successfully.\n Please check your email to verify your account in 48 hours.");
+		
+	}
+	
+
+	/*@Override
 	public Result add(Employer employer) {
 		
 		if (this.employerInfoCheckService.isValidEmployer(employer).isSuccess()) {
@@ -74,6 +94,6 @@ public class EmployerManager implements EmployerService{
 				return new ErrorResult("İş veren eklenmesi için email ve HRMS doğrulamasının tamamlanması gerekiyor.");
 		}
 		else return new ErrorResult("İş veren eklenemedi");
-	}
+	}*/
 
 }

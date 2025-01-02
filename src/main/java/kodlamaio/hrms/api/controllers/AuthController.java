@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import jakarta.validation.Valid;
 import kodlamaio.hrms.business.abstracts.CandidateService;
+import kodlamaio.hrms.business.abstracts.EmployerService;
 import kodlamaio.hrms.core.entities.ERole;
 import kodlamaio.hrms.core.entities.RefreshToken;
 import kodlamaio.hrms.core.entities.Role;
@@ -18,10 +19,12 @@ import kodlamaio.hrms.dataAccess.abstracts.verifications.CandidateEmailVerificat
 import kodlamaio.hrms.dataAccess.abstracts.verifications.EmailVerificationDao;
 import kodlamaio.hrms.dataAccess.abstracts.verifications.EmployerEmailVerificationDao;
 import kodlamaio.hrms.entities.concretes.Candidate;
+import kodlamaio.hrms.entities.concretes.Employer;
 import kodlamaio.hrms.entities.concretes.User;
 import kodlamaio.hrms.entities.concretes.verifications.CandidateEmailVerification;
 import kodlamaio.hrms.payload.request.LoginRequest;
 import kodlamaio.hrms.payload.request.SignupCandidateRequest;
+import kodlamaio.hrms.payload.request.SignupEmployerRequest;
 import kodlamaio.hrms.payload.request.SignupRequest;
 import kodlamaio.hrms.payload.request.TokenRefreshRequest;
 import kodlamaio.hrms.payload.response.JwtResponse;
@@ -62,6 +65,9 @@ public class AuthController {
   
   @Autowired
   CandidateService candidateService;
+  
+  @Autowired
+  EmployerService employerService;
 
   @Autowired
   RoleDao roleRepository;
@@ -311,6 +317,100 @@ public class AuthController {
 
     return ResponseEntity.ok(new MessageResponse("Candidate registered successfully!"));
   }
+  
+  
+  @PostMapping("/signup/employer")
+  public ResponseEntity<?> registerEmployer(@Valid @RequestBody SignupEmployerRequest signupEmployerRequest) {
+	  
+    if (userRepository.existsByUsername(signupEmployerRequest.getUsername())) {
+      return ResponseEntity
+          .badRequest()
+          .body(new MessageResponse("Error: Username is already taken!"));
+    }
+
+    if (userRepository.existsByEmail(signupEmployerRequest.getEmail())) {
+      return ResponseEntity
+          .badRequest()
+          .body(new MessageResponse("Error: Email is already in use!"));
+    }
+    
+    //check domains
+    String emailDomain = extractDomainFromEmail(signupEmployerRequest.getEmail()); 
+    String webDomain = extractDomainFromWebAddress(signupEmployerRequest.getWebAddress()); 
+    
+    if (!emailDomain.equalsIgnoreCase(webDomain)) {
+        return ResponseEntity
+            .badRequest()
+            .body(new MessageResponse("Error: Email and web adress domains do not match!"));
+      }
+   
+    // Form new employer's account
+    Employer newEmployer = new Employer(signupEmployerRequest.getUsername(), signupEmployerRequest.getEmail(),
+    		encoder.encode(signupEmployerRequest.getPassword()), signupEmployerRequest.getCompanyName(), signupEmployerRequest.getWebAddress(), 
+    		signupEmployerRequest.getPhoneNumber());
+       
+    Set<String> strRoles = signupEmployerRequest.getRole();
+    Set<Role> roles = new HashSet<>();
+
+    if (strRoles == null) {
+      Role employerRole = roleRepository.findByName(ERole.ROLE_EMPLOYER)
+          .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+      roles.add(employerRole);
+    } else {
+      strRoles.forEach(role -> {
+        switch (role) {
+        case "admin":
+          Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
+              .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+          roles.add(adminRole);
+
+          break;
+        case "candidate":
+            Role candidateRole = roleRepository.findByName(ERole.ROLE_CANDIDATE)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+            roles.add(candidateRole);
+
+            break;               
+        case "employer":
+          Role employerRole = roleRepository.findByName(ERole.ROLE_EMPLOYER)
+              .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+          roles.add(employerRole);
+
+          break;
+        case "employee":
+            Role employeeRole = roleRepository.findByName(ERole.ROLE_EMPLOYEE)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+            roles.add(employeeRole);
+
+            break;
+       
+        default:
+          Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+              .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+          roles.add(userRole);
+        }
+      });
+    }
+
+    newEmployer.setRoles(roles);
+    employerService.add(newEmployer);
+
+    return ResponseEntity.ok(new MessageResponse("Employer registered successfully!"));
+  }
+  
+  private static String extractDomainFromEmail(String email) { 
+	  int atIndex = email.indexOf('@'); 
+	  return email.substring(atIndex + 1); 
+	  } 
+  
+  private static String extractDomainFromWebAddress(String webAddress) { 
+	  String domain = webAddress.replaceFirst("https?://(www\\.)?", ""); 
+	  int slashIndex = domain.indexOf('/'); 
+	  if (slashIndex != -1) { 
+		  domain = domain.substring(0, slashIndex); } 
+	  return domain; 
+  }
+  
   
   @PostMapping("/signout")
   public ResponseEntity<?> logoutUser() { 
