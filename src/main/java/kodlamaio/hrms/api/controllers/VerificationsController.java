@@ -39,12 +39,14 @@ public class VerificationsController {
 	
 	@Autowired
 	public VerificationsController(UserDao userDao, CandidateEmailVerificationDao candidateEmailVerificationDao,
-			EmployerEmailVerificationDao employerEmailVerificationDao, EmployeeConfirmEmployerDao employeeConfirmEmployerDao) {
+			EmployerEmailVerificationDao employerEmailVerificationDao, EmployeeConfirmEmployerDao employeeConfirmEmployerDao, 
+			EmployerDao employerDao) {
 		super();
 		this.userDao = userDao;
 		this.candidateEmailVerificationDao = candidateEmailVerificationDao;
 		this.employerEmailVerificationDao = employerEmailVerificationDao;
 		this.employeeConfirmEmployerDao = employeeConfirmEmployerDao;
+		this.employerDao = employerDao;
 	}
 
 
@@ -130,7 +132,7 @@ public class VerificationsController {
 				return new ErrorResult("Employer confirmation has already been done!");
 			} 
 			else {
-				employeeConfirmEmployer.setEmployeeId(employeeId); //burda hata vermedi??
+				employeeConfirmEmployer.setEmployeeId(employeeId); //burda hata vermedi
 				employeeConfirmEmployer.setIsConfirmed(true);
 				employeeConfirmEmployer.setConfirmDate(LocalDateTime.now());
 				employeeConfirmEmployerDao.save(employeeConfirmEmployer);
@@ -139,7 +141,7 @@ public class VerificationsController {
 				Optional<Employer> optionalEmployer = employerDao.findById(employerId);
 				if (optionalEmployer.isPresent()) {
 					Employer employer = optionalEmployer.get();
-					employer.setEmployeeConfirmed(true);
+					employer.setEmployeeConfirmed(true); 
 					employerDao.save(employer);							
 					return new SuccessResult("Employer confirmation is completed!");
 				}else 

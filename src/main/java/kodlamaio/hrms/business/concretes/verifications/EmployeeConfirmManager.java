@@ -25,10 +25,10 @@ public class EmployeeConfirmManager implements EmployeeConfirmService{
 	@Override
 	public Result generateEmployeeConfirmation(Employer employer) {
 		
-		EmployeeConfirmEmployer employeeConfirmEmployer = new EmployeeConfirmEmployer();
+		EmployeeConfirmEmployer employeeConfirmEmployer = new EmployeeConfirmEmployer(employer.getId(), false);
 		
-		employeeConfirmEmployer.setEmployerId(employer.getId());
-		employeeConfirmEmployer.setIsConfirmed(false);
+		//employeeConfirmEmployer.setEmployerId(employer.getId());
+		//employeeConfirmEmployer.setIsConfirmed(false);
 		
     	this.employeeConfirmEmployerDao.save(employeeConfirmEmployer);
 		

@@ -36,7 +36,13 @@ public class EmployeeConfirmEmployer {//extends EmployeeConfirm{
 	private Boolean isConfirmed;
 	
 	@Column(name="confirm_date")
-	private LocalDateTime confirmDate;	
+	private LocalDateTime confirmDate;
+
+	public EmployeeConfirmEmployer(int employerId, Boolean isConfirmed) {
+		super();
+		this.employerId = employerId;
+		this.isConfirmed = isConfirmed;
+	}	
 	
 
 

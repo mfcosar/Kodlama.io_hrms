@@ -58,7 +58,7 @@ public class EmployerManager implements EmployerService{
 		
 		this.employerDao.save(employer); //candidateId olmadan generate cagrılırsa db hata veriyor
 		emailVerificationService.generateVerificationEmailForEmployer(employer);
-		employeeConfirmService.generateEmployeeConfirmation(employer);  //2 basamaklı confirm oldugu için
+		employeeConfirmService.generateEmployeeConfirmation(employer);  //2 basamaklı confirm oldugu için HRMS personeli de onaylamalı
 
 		return new SuccessResult("You are registered successfully.\n Please check your email to verify your account in 48 hours.");
 		
