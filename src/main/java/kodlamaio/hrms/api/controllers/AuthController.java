@@ -13,15 +13,19 @@ import kodlamaio.hrms.core.entities.ERole;
 import kodlamaio.hrms.core.entities.RefreshToken;
 import kodlamaio.hrms.core.entities.Role;
 import kodlamaio.hrms.dataAccess.abstracts.CandidateDao;
+import kodlamaio.hrms.dataAccess.abstracts.EmployerDao;
 import kodlamaio.hrms.dataAccess.abstracts.RoleDao;
 import kodlamaio.hrms.dataAccess.abstracts.UserDao;
 import kodlamaio.hrms.dataAccess.abstracts.verifications.CandidateEmailVerificationDao;
 import kodlamaio.hrms.dataAccess.abstracts.verifications.EmailVerificationDao;
+import kodlamaio.hrms.dataAccess.abstracts.verifications.EmployeeConfirmEmployerDao;
 import kodlamaio.hrms.dataAccess.abstracts.verifications.EmployerEmailVerificationDao;
 import kodlamaio.hrms.entities.concretes.Candidate;
 import kodlamaio.hrms.entities.concretes.Employer;
 import kodlamaio.hrms.entities.concretes.User;
 import kodlamaio.hrms.entities.concretes.verifications.CandidateEmailVerification;
+import kodlamaio.hrms.entities.concretes.verifications.EmployeeConfirmEmployer;
+import kodlamaio.hrms.entities.concretes.verifications.EmployerEmailVerification;
 import kodlamaio.hrms.payload.request.LoginRequest;
 import kodlamaio.hrms.payload.request.SignupCandidateRequest;
 import kodlamaio.hrms.payload.request.SignupEmployerRequest;
@@ -62,6 +66,9 @@ public class AuthController {
   
   @Autowired
   CandidateDao candidateRepository;
+
+  @Autowired
+  EmployerDao employerRepository;
   
   @Autowired
   CandidateService candidateService;
@@ -89,7 +96,9 @@ public class AuthController {
   
   @Autowired
   EmailVerificationDao emailVerificationDao;
-  
+
+  @Autowired
+  EmployeeConfirmEmployerDao employeeConfirmEmployerDao;  
 
   @PostMapping("/signin")
   public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -101,6 +110,7 @@ public class AuthController {
 	  optUser = userRepository.findByUsername(username);
 	  if (optUser.isPresent()) {
 		  User user = optUser.get();
+		  Optional<EmployeeConfirmEmployer> optEmployeeConfirmEmployer= employeeConfirmEmployerDao.findByEmployerId(user.getId());
 		  if (!user.getVerified()) {
 			  //check if verification link has expired
 			  
@@ -130,9 +140,48 @@ public class AuthController {
 				          .badRequest()
 				          .body(new MessageResponse("User account is not verified yet! Please check your email box to verify your HRMS account."));
 			  }
-
-		  }
-	  }else {
+			  //if user is an employer, than email verification check
+			  
+			  Optional<EmployerEmailVerification> optEmployerEmailVerification= employerEmailVerificationDao.findByEmployerId(user.getId());
+			  if (optEmployerEmailVerification.isPresent()) {
+				  EmployerEmailVerification employerEmailVerification= optEmployerEmailVerification.get();
+				  if (employerEmailVerification.getVerificationExpiry().isBefore(LocalDateTime.now())) {
+					  //expired: delete user from all db tables
+					  user.setRoles(null); //burda UserRolesDao lazım mı??
+					  //find verification record & delete
+					  int verificationId = employerEmailVerification.getId();
+					  int employerId = employerEmailVerification.getEmployerId();
+					  employerEmailVerificationDao.deleteById(verificationId);
+					  emailVerificationDao.deleteById(verificationId);
+					  employeeConfirmEmployerDao.deleteByEmployerId(employerId);
+					  employerRepository.deleteById(employerId);
+					  userRepository.deleteById(user.getId());
+					  //silinecekler var candidateDao/employerDao' dan sil.. 
+					  
+					  return ResponseEntity
+					          .badRequest()
+					          .body(new MessageResponse("Verification link has expired. Please sign up again!"));
+				  }
+				  else return ResponseEntity
+				          .badRequest()
+				          .body(new MessageResponse("User account is not verified yet! Please check your email box to verify your HRMS account."));
+			  }
+			  
+			  
+		  } //user is verified but if user is employer second employee confirmation must be checked
+		  else if ( !optEmployeeConfirmEmployer.isPresent())
+			  return ResponseEntity
+			          .badRequest()
+			          .body(new MessageResponse("Invalid employer name!"));
+		  
+		  else if ( optEmployeeConfirmEmployer.isPresent()) { //user.getVerified() &&
+			  EmployeeConfirmEmployer employeeConfirmEmployer = optEmployeeConfirmEmployer.get();
+			  if (!employeeConfirmEmployer.getIsConfirmed())
+				  return ResponseEntity
+				          .badRequest()
+				          .body(new MessageResponse("Employer account has not been confirmed by HRMS personnel yet!"));
+		 }
+	  } else {
 		  return ResponseEntity
 		          .badRequest()
 		          .body(new MessageResponse("Invalid username!"));

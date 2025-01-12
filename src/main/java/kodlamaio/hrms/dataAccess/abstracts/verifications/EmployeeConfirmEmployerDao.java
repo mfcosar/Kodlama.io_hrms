@@ -8,4 +8,6 @@ import kodlamaio.hrms.entities.concretes.verifications.EmployeeConfirmEmployer;
 public interface EmployeeConfirmEmployerDao extends JpaRepository<EmployeeConfirmEmployer, Integer>{
 
 	Optional<EmployeeConfirmEmployer> findByEmployerId(int employerId);
+	boolean deleteByEmployerId(int employerId);
+	
 }

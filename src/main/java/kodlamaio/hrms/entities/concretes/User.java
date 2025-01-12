@@ -63,7 +63,7 @@ public class User {
 	private Set<Role> roles = new HashSet<>();
 
 	@Column(name="verified")
-	private Boolean verified; //primitive type boolean hata veriyor	??
+	private Boolean verified=false; //primitive type boolean hata veriyor	??
 	
 	/*private LocalDateTime verificationExpiry;*/
 
