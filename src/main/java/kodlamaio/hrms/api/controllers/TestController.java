@@ -33,19 +33,19 @@ public class TestController {
   @GetMapping("/employer")
   @PreAuthorize("hasRole('ROLE_EMPLOYER')")
   public String employerAccess() {
-    return "Employer Board.";
+    return "Employer Board";
   }
  
   @GetMapping("/employee")
   @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
   public String employeeAccess() {
-    return "Employee Board.";
+    return "Employee Board";
   }
   
   @GetMapping("/admin")
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   public String adminAccess() {
-    return "Admin Board.";
+    return "Admin Board";
   }
 
 

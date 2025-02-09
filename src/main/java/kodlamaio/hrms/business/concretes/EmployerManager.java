@@ -63,6 +63,37 @@ public class EmployerManager implements EmployerService{
 		return new SuccessResult("You are registered successfully.\n Please check your email to verify your account in 48 hours.");
 		
 	}
+
+
+	@Override
+	public DataResult<Employer> getEmployerById(int employerId) {
+		return new SuccessDataResult<Employer>(this.employerDao.findById(employerId), "Employer data is listed");
+	}
+
+
+	@Override
+	public Result update(Employer employerUpdated) {
+		
+		Employer exEmployer = employerDao.findById(employerUpdated.getId());
+		
+		//if user name changed..check
+		if (!exEmployer.getUsername().equals((employerUpdated).getUsername())) {
+			
+			if (employerDao.existsByUsername(employerUpdated.getUsername()))
+				return new ErrorResult("User name is already in use!");
+			else { 
+				exEmployer.setUsername(employerUpdated.getUsername());
+				exEmployer.setEmail(employerUpdated.getEmail());
+			}
+		}
+		
+		exEmployer.setCompanyName(employerUpdated.getCompanyName());
+		exEmployer.setPhoneNumber(employerUpdated.getPhoneNumber());
+		exEmployer.setWebAddress(employerUpdated.getWebAddress());
+		employerDao.save(exEmployer);
+		
+		return new SuccessResult("Employer profile updated succesfully");
+	}
 	
 
 	/*@Override

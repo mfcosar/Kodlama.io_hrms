@@ -110,13 +110,14 @@ public class AuthController {
 	  optUser = userRepository.findByUsername(username);
 	  if (optUser.isPresent()) {
 		  User user = optUser.get();
+		  
 		  Optional<EmployeeConfirmEmployer> optEmployeeConfirmEmployer= employeeConfirmEmployerDao.findByEmployerId(user.getId());
+		  Optional<CandidateEmailVerification> optCandidateEmailVerification= candidateEmailVerificationDao.findByCandidateId(user.getId());
+		  Optional<EmployerEmailVerification> optEmployerEmailVerification= employerEmailVerificationDao.findByEmployerId(user.getId());
+
 		  if (!user.getVerified()) {
 			  //check if verification link has expired
 			  
-			  //bütün verifications'u bir tek emailverificationsa da topla çok dallandırma..
-			  
-			  Optional<CandidateEmailVerification> optCandidateEmailVerification= candidateEmailVerificationDao.findByCandidateId(user.getId());
 			  if (optCandidateEmailVerification.isPresent()) {
 				  CandidateEmailVerification candidateEmailVerification= optCandidateEmailVerification.get();
 				  if (candidateEmailVerification.getVerificationExpiry().isBefore(LocalDateTime.now())) {
@@ -140,10 +141,9 @@ public class AuthController {
 				          .badRequest()
 				          .body(new MessageResponse("User account is not verified yet! Please check your email box to verify your HRMS account."));
 			  }
+			 
 			  //if user is an employer, than email verification check
-			  
-			  Optional<EmployerEmailVerification> optEmployerEmailVerification= employerEmailVerificationDao.findByEmployerId(user.getId());
-			  if (optEmployerEmailVerification.isPresent()) {
+			  else if (optEmployerEmailVerification.isPresent()) {  
 				  EmployerEmailVerification employerEmailVerification= optEmployerEmailVerification.get();
 				  if (employerEmailVerification.getVerificationExpiry().isBefore(LocalDateTime.now())) {
 					  //expired: delete user from all db tables
@@ -169,23 +169,27 @@ public class AuthController {
 			  
 			  
 		  } //user is verified but if user is employer second employee confirmation must be checked
-		  else if ( !optEmployeeConfirmEmployer.isPresent())
+		  else if ( user.getVerified() && optEmployerEmailVerification.isPresent() && !optEmployeeConfirmEmployer.isPresent())
 			  return ResponseEntity
 			          .badRequest()
-			          .body(new MessageResponse("Invalid employer name!"));
+			          .body(new MessageResponse("Employer must be confirmed by HRMS personnel!"));
 		  
-		  else if ( optEmployeeConfirmEmployer.isPresent()) { //user.getVerified() &&
+		  else if ( user.getVerified() && optEmployeeConfirmEmployer.isPresent()) { //user.getVerified() &&
 			  EmployeeConfirmEmployer employeeConfirmEmployer = optEmployeeConfirmEmployer.get();
 			  if (!employeeConfirmEmployer.getIsConfirmed())
 				  return ResponseEntity
 				          .badRequest()
 				          .body(new MessageResponse("Employer account has not been confirmed by HRMS personnel yet!"));
 		 }
-	  } else {
+	  } // optUser is not present
+	  else if (!optUser.isPresent()) {
+		  System.out.print("This username cannot be found in db : "+username);
+		  
 		  return ResponseEntity
 		          .badRequest()
 		          .body(new MessageResponse("Invalid username!"));
 	  }
+	  
 	  
 	//user verified ise aşağıdaki kod ile authentication yapılır	 
     Authentication authentication = authenticationManager

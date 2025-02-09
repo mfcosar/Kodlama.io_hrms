@@ -138,9 +138,10 @@ public class VerificationsController {
 				employeeConfirmEmployerDao.save(employeeConfirmEmployer);
 				
 				//find the employer and set it as employeeConfirmed
-				Optional<Employer> optionalEmployer = employerDao.findById(employerId);
-				if (optionalEmployer.isPresent()) {
-					Employer employer = optionalEmployer.get();
+				//Optional<Employer> optionalEmployer = employerDao.findById(employerId);
+				Employer optionalEmployer = employerDao.findById(employerId);
+				if (optionalEmployer != null) {
+					Employer employer = optionalEmployer;//.get();
 					employer.setEmployeeConfirmed(true); 
 					employerDao.save(employer);							
 					return new SuccessResult("Employer confirmation is completed!");
