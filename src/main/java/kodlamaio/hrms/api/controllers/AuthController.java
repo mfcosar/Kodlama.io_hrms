@@ -167,6 +167,9 @@ public class AuthController {
 				          .body(new MessageResponse("User account is not verified yet! Please check your email box to verify your HRMS account."));
 			  }
 			  
+			  else return ResponseEntity
+			          .badRequest()
+			          .body(new MessageResponse("User account is not verified yet! Please check your email box to verify your HRMS account."));
 			  
 		  } //user is verified but if user is employer second employee confirmation must be checked
 		  else if ( user.getVerified() && optEmployerEmailVerification.isPresent() && !optEmployeeConfirmEmployer.isPresent())

@@ -87,16 +87,36 @@ public class CandidateManager implements CandidateService{
 		//return new SuccessResult("Aday eklendi");
 	}
 	
-	/*private String sendVerificationEmail(Candidate candidate) {
-		String verificationLink = "http://localhost:8080/api/verifications/verifyAccount?token=" + candidate.getId();
-		String emailBody = "Please click the link below to verify your account:\n" + verificationLink;
-		return emailVerificationService.sendEmail(candidate.getEmail(), "Account Verification", emailBody);
-	}*/
-	
 
 	@Override
 	public DataResult<Candidate> findCandidateById(int candidateId) {
-		return new SuccessDataResult<Candidate>(this.candidateDao.findCandidateById(candidateId), "Aday bilgisi listelendi");
+		return new SuccessDataResult<Candidate>(this.candidateDao.findCandidateById(candidateId), "Candidate data is listed");
 	}
 	
+	@Override
+	public Result update(Candidate candidateUpdated) {
+		
+		Candidate exCandidate = candidateDao.findCandidateById(candidateUpdated.getId());
+		
+		//if user name changed..check
+		if (!exCandidate.getUsername().equals((candidateUpdated).getUsername())) {
+			
+			if (candidateDao.existsByUsername(candidateUpdated.getUsername()))
+				return new ErrorResult("User name is already in use!");
+			else { 
+				System.out.print("Candidate username/email is changed to: " + candidateUpdated.getUsername());
+				exCandidate.setUsername(candidateUpdated.getUsername());
+				exCandidate.setEmail(candidateUpdated.getEmail());
+			}
+		}
+		
+		exCandidate.setFirstName(candidateUpdated.getFirstName());
+		exCandidate.setLastName(candidateUpdated.getLastName());
+		exCandidate.setTcIdentityNumber(candidateUpdated.getTcIdentityNumber());
+		exCandidate.setBirthYear(candidateUpdated.getBirthYear());
+
+		candidateDao.save(exCandidate);
+		
+		return new SuccessResult("Candidate profile updated succesfully");
+	}	
 }
