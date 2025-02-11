@@ -33,7 +33,7 @@ public class JobAdvertisementManager implements JobAdvertisementService{
 	@Override
 	public Result add(JobAdvertisement jobAdvertisement) {
 		this.jobAdvertisementDao.save(jobAdvertisement);
-		return new SuccessResult("İş ilanı eklendi");
+		return new SuccessResult("Job advertisement is added to system");
 	}
 
 	@Override

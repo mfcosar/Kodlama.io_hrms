@@ -16,7 +16,7 @@ import kodlamaio.hrms.entities.concretes.WorkingType;
 
 @RestController
 @RequestMapping("/api/workingtypes")
-@CrossOrigin //front end'in istek yapabilmesi için
+@CrossOrigin(origins = "*", maxAge = 3600) //front end'in istek yapabilmesi için
 public class WorkingTypesController {
 
 	private WorkingTypeService workingTypeService;

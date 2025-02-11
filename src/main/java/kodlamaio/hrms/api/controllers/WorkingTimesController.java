@@ -16,7 +16,7 @@ import kodlamaio.hrms.entities.concretes.WorkingTime;
 
 @RestController
 @RequestMapping("/api/workingtimes")
-@CrossOrigin //front end'in istek yapabilmesi için
+@CrossOrigin(origins = "*", maxAge = 3600)//front end'in istek yapabilmesi için
 public class WorkingTimesController {
 	
 	private WorkingTimeService workingTimeService;
