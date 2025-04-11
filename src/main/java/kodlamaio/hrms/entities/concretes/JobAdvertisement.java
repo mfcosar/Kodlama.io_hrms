@@ -1,5 +1,7 @@
 package kodlamaio.hrms.entities.concretes;
 
+//import java.time.LocalDate;
+//import java.time.LocalDateTime;
 import java.util.Date;
 
 import jakarta.persistence.Column;
@@ -72,10 +74,10 @@ public class JobAdvertisement {
 	
 	
 	@Column(name="last_application_date")
-	private Date lastApplicationDate;
+	private Date  lastApplicationDate; //LocalDate
 	
 	@Column(name="publication_date")
-	private Date publicationDate;
+	private  Date  publicationDate; //LocalDateTime
 	
 	@Column(name="is_active")
 	private boolean isActive=true;
