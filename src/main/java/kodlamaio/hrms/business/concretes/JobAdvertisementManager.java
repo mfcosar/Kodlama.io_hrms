@@ -117,7 +117,7 @@ public class JobAdvertisementManager implements JobAdvertisementService{
 
 	@Override
 	public DataResult<List<JobAdvertisement>> findJobAdvertisementsByEmployerId(int employerId) {
-		return new SuccessDataResult<List<JobAdvertisement>>(this.jobAdvertisementDao.findJobAdvertisementsByEmployerId(employerId), "Firmaya ait tüm aktif iş ilanları listelendi.");
+		return new SuccessDataResult<List<JobAdvertisement>>(this.jobAdvertisementDao.findJobAdvertisementsByEmployerIdOrderById(employerId), "Firmaya ait tüm aktif iş ilanları listelendi.");
 	}
 
 	@Override
@@ -166,6 +166,10 @@ public class JobAdvertisementManager implements JobAdvertisementService{
 		exJobAdvertisement.setOpenPositionAmount(jobAdvertisementUpdated.getOpenPositionAmount());
 		exJobAdvertisement.setLastApplicationDate(jobAdvertisementUpdated.getLastApplicationDate());
 		exJobAdvertisement.setDescription(jobAdvertisementUpdated.getDescription());
+		exJobAdvertisement.setConfirmed(jobAdvertisementUpdated.isConfirmed());	
+		exJobAdvertisement.setActive(jobAdvertisementUpdated.isActive());
+		
+		
 		jobAdvertisementDao.save(exJobAdvertisement);
 		
 		return new SuccessResult("JobAdvertisement updated succesfully");

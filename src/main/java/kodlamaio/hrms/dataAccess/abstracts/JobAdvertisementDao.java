@@ -42,7 +42,7 @@ public interface JobAdvertisementDao extends JpaRepository<JobAdvertisement, Int
 			+ "FROM JobAdvertisement ja JOIN ja.job j JOIN ja.employer e WHERE e.id = :employerId ")
 	List<JobAdvertisementDto> findJobAdvertisementDtosByEmployerId(int employerId);	
 	
-	List<JobAdvertisement> findJobAdvertisementsByEmployerId(int employerId);
+	List<JobAdvertisement> findJobAdvertisementsByEmployerIdOrderById(int employerId);
 	
 	/* List<JobAdvertisement> findByIsActiveTrue();
 	List<JobAdvertisement> findByIsActiveTrueOrderByPublicationDateAsc(); 
