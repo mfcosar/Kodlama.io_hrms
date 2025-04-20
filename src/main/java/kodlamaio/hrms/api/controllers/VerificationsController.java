@@ -17,11 +17,13 @@ import kodlamaio.hrms.dataAccess.abstracts.EmployerDao;
 import kodlamaio.hrms.dataAccess.abstracts.UserDao;
 import kodlamaio.hrms.dataAccess.abstracts.verifications.CandidateEmailVerificationDao;
 import kodlamaio.hrms.dataAccess.abstracts.verifications.EmployeeConfirmEmployerDao;
+import kodlamaio.hrms.dataAccess.abstracts.verifications.EmployeeEmailVerificationDao;
 import kodlamaio.hrms.dataAccess.abstracts.verifications.EmployerEmailVerificationDao;
 import kodlamaio.hrms.entities.concretes.Employer;
 import kodlamaio.hrms.entities.concretes.User;
 import kodlamaio.hrms.entities.concretes.verifications.CandidateEmailVerification;
 import kodlamaio.hrms.entities.concretes.verifications.EmployeeConfirmEmployer;
+import kodlamaio.hrms.entities.concretes.verifications.EmployeeEmailVerification;
 import kodlamaio.hrms.entities.concretes.verifications.EmployerEmailVerification;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -33,6 +35,7 @@ public class VerificationsController {
 	private UserDao userDao;
 	private CandidateEmailVerificationDao candidateEmailVerificationDao;
 	private EmployerEmailVerificationDao employerEmailVerificationDao;
+	private EmployeeEmailVerificationDao employeeEmailVerificationDao;
 	private EmployeeConfirmEmployerDao employeeConfirmEmployerDao;
 	private EmployerDao employerDao;
 	
@@ -40,11 +43,12 @@ public class VerificationsController {
 	@Autowired
 	public VerificationsController(UserDao userDao, CandidateEmailVerificationDao candidateEmailVerificationDao,
 			EmployerEmailVerificationDao employerEmailVerificationDao, EmployeeConfirmEmployerDao employeeConfirmEmployerDao, 
-			EmployerDao employerDao) {
+			EmployerDao employerDao, EmployeeEmailVerificationDao employeeEmailVerificationDao) {
 		super();
 		this.userDao = userDao;
 		this.candidateEmailVerificationDao = candidateEmailVerificationDao;
 		this.employerEmailVerificationDao = employerEmailVerificationDao;
+		this.employeeEmailVerificationDao = employeeEmailVerificationDao;
 		this.employeeConfirmEmployerDao = employeeConfirmEmployerDao;
 		this.employerDao = employerDao;
 	}
@@ -120,6 +124,41 @@ public class VerificationsController {
 		}
 		return new ErrorResult("Verification failed!"); //code isnt in db
 	}
+	
+	@GetMapping("/verifyEmployeeAccount")
+	public Result verifyEmployeeAccount(@RequestParam("token") String code, @RequestParam("employeeId") int employeeId) {
+			
+			Optional<EmployeeEmailVerification> optEmployeeEmailVerification=employeeEmailVerificationDao.findByCode(code);
+			if (optEmployeeEmailVerification.isPresent()) {
+				EmployeeEmailVerification employeeEmailVerification=optEmployeeEmailVerification.get();
+				if (employeeEmailVerification.getEmployeeId()==employeeId) {
+					if (!employeeEmailVerification.isVerified() ) {
+		
+						if (employeeEmailVerification.getVerificationExpiry().isAfter(LocalDateTime.now())) {
+							employeeEmailVerification.setVerified(true);
+							employeeEmailVerificationDao.save(employeeEmailVerification);
+							
+							Optional<User> optionalUser = userDao.findById(employeeId);
+							if (optionalUser.isPresent()) {
+								User user = optionalUser.get();
+								user.setVerified(true);
+								userDao.save(user);							
+								return new SuccessResult("Your account has been successfully verified.");
+							}else 
+								return new ErrorResult("User verification is not complete!");
+							
+						} else {
+							return new ErrorResult("The verification link has expired!");
+						}
+					}
+					else {
+						return new ErrorResult("Your account has already been verified.");
+					}
+				}
+				else {return new ErrorResult("Verification data is incorrect");}
+		}
+		return new ErrorResult("Verification failed!"); //code isnt in db
+	}	
 	
 	@GetMapping("/employeeConfirmEmployer")
 	public Result employeeConfirmEmployerAccount(@RequestParam("employeeId") int employeeId, @RequestParam("employerId") int employerId) {

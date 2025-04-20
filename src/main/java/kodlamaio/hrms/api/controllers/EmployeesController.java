@@ -39,5 +39,9 @@ public class EmployeesController {
 		return this.employeeService.add(employee);
 	}
 	
+	@PostMapping("/delete")
+	public Result delete(@RequestBody Employee employee) {
+		return this.employeeService.delete(employee.getId());
+	}	
 
 }

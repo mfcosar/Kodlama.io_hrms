@@ -8,23 +8,27 @@ import java.util.stream.Collectors;
 
 import jakarta.validation.Valid;
 import kodlamaio.hrms.business.abstracts.CandidateService;
+import kodlamaio.hrms.business.abstracts.EmployeeService;
 import kodlamaio.hrms.business.abstracts.EmployerService;
 import kodlamaio.hrms.core.entities.ERole;
 import kodlamaio.hrms.core.entities.RefreshToken;
 import kodlamaio.hrms.core.entities.Role;
 import kodlamaio.hrms.dataAccess.abstracts.CandidateDao;
+import kodlamaio.hrms.dataAccess.abstracts.EmployeeDao;
 import kodlamaio.hrms.dataAccess.abstracts.EmployerDao;
 import kodlamaio.hrms.dataAccess.abstracts.RoleDao;
 import kodlamaio.hrms.dataAccess.abstracts.UserDao;
 import kodlamaio.hrms.dataAccess.abstracts.verifications.CandidateEmailVerificationDao;
 import kodlamaio.hrms.dataAccess.abstracts.verifications.EmailVerificationDao;
 import kodlamaio.hrms.dataAccess.abstracts.verifications.EmployeeConfirmEmployerDao;
+import kodlamaio.hrms.dataAccess.abstracts.verifications.EmployeeEmailVerificationDao;
 import kodlamaio.hrms.dataAccess.abstracts.verifications.EmployerEmailVerificationDao;
 import kodlamaio.hrms.entities.concretes.Candidate;
 import kodlamaio.hrms.entities.concretes.Employer;
 import kodlamaio.hrms.entities.concretes.User;
 import kodlamaio.hrms.entities.concretes.verifications.CandidateEmailVerification;
 import kodlamaio.hrms.entities.concretes.verifications.EmployeeConfirmEmployer;
+import kodlamaio.hrms.entities.concretes.verifications.EmployeeEmailVerification;
 import kodlamaio.hrms.entities.concretes.verifications.EmployerEmailVerification;
 import kodlamaio.hrms.payload.request.LoginRequest;
 import kodlamaio.hrms.payload.request.SignupCandidateRequest;
@@ -69,13 +73,19 @@ public class AuthController {
 
   @Autowired
   EmployerDao employerRepository;
+
+  @Autowired
+  EmployeeDao employeeRepository;
   
   @Autowired
   CandidateService candidateService;
   
   @Autowired
   EmployerService employerService;
-
+  
+  @Autowired
+  EmployeeService employeeService;
+  
   @Autowired
   RoleDao roleRepository;
 
@@ -90,6 +100,9 @@ public class AuthController {
   
   @Autowired
   CandidateEmailVerificationDao candidateEmailVerificationDao;
+  
+  @Autowired
+  EmployeeEmailVerificationDao employeeEmailVerificationDao;
   
   @Autowired
   EmployerEmailVerificationDao employerEmailVerificationDao;
@@ -114,7 +127,9 @@ public class AuthController {
 		  Optional<EmployeeConfirmEmployer> optEmployeeConfirmEmployer= employeeConfirmEmployerDao.findByEmployerId(user.getId());
 		  Optional<CandidateEmailVerification> optCandidateEmailVerification= candidateEmailVerificationDao.findByCandidateId(user.getId());
 		  Optional<EmployerEmailVerification> optEmployerEmailVerification= employerEmailVerificationDao.findByEmployerId(user.getId());
-
+		  Optional<EmployeeEmailVerification> optEmployeeEmailVerification= employeeEmailVerificationDao.findByEmployeeId(user.getId());
+		  
+		  
 		  if (!user.getVerified()) {
 			  //check if verification link has expired
 			  
@@ -142,6 +157,32 @@ public class AuthController {
 				          .body(new MessageResponse("User account is not verified yet! Please check your email box to verify your HRMS account."));
 			  }
 			 
+			  //if user is an employee, than email verification check			  
+			  else if (optEmployeeEmailVerification.isPresent()) {
+				  EmployeeEmailVerification employeeEmailVerification= optEmployeeEmailVerification.get();
+				  if (employeeEmailVerification.getVerificationExpiry().isBefore(LocalDateTime.now())) {
+					  //expired: delete user from all db tables
+					  //userRolesDao.deleteById(user.getId());
+					  user.setRoles(null); //burda UserRolesDao lazım mı??
+					  //find verification record & delete
+					  int verificationId = employeeEmailVerification.getId();
+					  int employeeId = employeeEmailVerification.getEmployeeId();
+					  employeeEmailVerificationDao.deleteById(verificationId);
+					  emailVerificationDao.deleteById(verificationId);
+					  employeeRepository.deleteById(employeeId);
+					  userRepository.deleteById(user.getId());
+					  //silinecekler var employeeDao' dan sil.. 
+					  
+					  return ResponseEntity
+					          .badRequest()
+					          .body(new MessageResponse("Verification link has expired. Please sign up again!"));
+				  }
+				  else return ResponseEntity
+				          .badRequest()
+				          .body(new MessageResponse("User account is not verified yet! Please check your email box to verify your HRMS account."));
+			  }
+			  
+			  		  
 			  //if user is an employer, than email verification check
 			  else if (optEmployerEmailVerification.isPresent()) {  
 				  EmployerEmailVerification employerEmailVerification= optEmployerEmailVerification.get();
@@ -276,12 +317,12 @@ public class AuthController {
           roles.add(employerRole);
 
           break;
-        case "employee":
+        /*case "employee":
             Role employeeRole = roleRepository.findByName(ERole.ROLE_EMPLOYEE)
                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
             roles.add(employeeRole);
 
-            break;
+            break;*/
        
         default:
           Role userRole = roleRepository.findByName(ERole.ROLE_USER)
@@ -353,12 +394,12 @@ public class AuthController {
           roles.add(employerRole);
 
           break;
-        case "employee":
+        /*case "employee":
             Role employeeRole = roleRepository.findByName(ERole.ROLE_EMPLOYEE)
                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
             roles.add(employeeRole);
 
-            break;
+            break;*/
        
         default:
           Role userRole = roleRepository.findByName(ERole.ROLE_USER)
@@ -433,12 +474,12 @@ public class AuthController {
           roles.add(employerRole);
 
           break;
-        case "employee":
+        /*case "employee":
             Role employeeRole = roleRepository.findByName(ERole.ROLE_EMPLOYEE)
                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
             roles.add(employeeRole);
 
-            break;
+            break;*/
        
         default:
           Role userRole = roleRepository.findByName(ERole.ROLE_USER)
