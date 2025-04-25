@@ -15,6 +15,7 @@ import kodlamaio.hrms.core.utilities.results.SuccessResult;
 import kodlamaio.hrms.dataAccess.abstracts.EmployeeDao;
 import kodlamaio.hrms.dataAccess.abstracts.UserDao;
 import kodlamaio.hrms.entities.concretes.Employee;
+import kodlamaio.hrms.entities.concretes.User;
 
 @Service
 public class EmployeeManager implements EmployeeService{
@@ -60,5 +61,38 @@ public class EmployeeManager implements EmployeeService{
 		
 		return new SuccessResult("HRMS employee deleted from system");
 	}
+	
+	@Override
+	public DataResult<Employee> getEmployeeById(int employeeId) {
+		Employee emp = this.employeeDao.findById(employeeId);
+		//System.out.println("get employee by employee userName: " + emp.getUsername());
+		return new SuccessDataResult<Employee>(emp, "Employee data is listed");
+	}	
 
+	
+	@Override
+	public Result update(Employee employeeUpdated) { 
+		
+		Employee exEmployee = employeeDao.findById(employeeUpdated.getId());
+		
+		
+		//if user name changed..check ; username /email change will be handled with a different console with new verification
+		if (!exEmployee.getUsername().equals((employeeUpdated).getUsername())) {
+			
+			if (employeeDao.existsByUsername(employeeUpdated.getUsername()))
+				return new ErrorResult("User name is already in use!");
+			else { 
+				exEmployee.setUsername(employeeUpdated.getUsername());
+				exEmployee.setEmail(employeeUpdated.getEmail());
+			}
+		}
+		
+		exEmployee.setFirstName(employeeUpdated.getFirstName());
+		exEmployee.setLastName(employeeUpdated.getLastName());
+		
+		
+		employeeDao.save(exEmployee);
+		
+		return new SuccessResult("Employer profile updated succesfully");
+	}	
 }
