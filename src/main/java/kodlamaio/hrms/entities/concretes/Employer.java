@@ -52,6 +52,7 @@ public class Employer extends User{
 		this.companyName= companyName;
 		this.webAddress= webAddress;
 		this.phoneNumber= phoneNumber;
+		this.employeeConfirmed = false;
 	}
 	
 

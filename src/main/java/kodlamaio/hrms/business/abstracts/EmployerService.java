@@ -9,6 +9,7 @@ import kodlamaio.hrms.entities.concretes.Employer;
 public interface EmployerService {
 	
 	DataResult<List<Employer>> getAll();
+	DataResult<List<Employer>> getAllUnconfirmedEmployers();
 	Result add(Employer employer);
 	DataResult<Employer> getEmployerById(int employerId);
 	Result update(Employer employer);

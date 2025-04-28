@@ -249,12 +249,16 @@ public class AuthController {
 
     List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
         .collect(Collectors.toList());
-
+    
+    //System.out.println("loginRequest.getUsername(): "+loginRequest.getUsername() +"   roles: " + roles.getFirst());
     RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
 
     return ResponseEntity.ok(new JwtResponse(jwt, refreshToken.getToken(), userDetails.getId(),
         userDetails.getUsername(), userDetails.getEmail(), roles));
   }
+  
+  
+  
   
   @PostMapping("/refreshtoken")
   public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
@@ -492,7 +496,7 @@ public class AuthController {
     }
 
     newEmployer.setRoles(roles);
-    employerService.add(newEmployer);
+    employerService.add(newEmployer); //manager'da eklenen employer için verification ve confirmation girdileri db'e ekleniyor
 
     return ResponseEntity.ok(new MessageResponse("Employer registered successfully!"));
   }
@@ -509,6 +513,9 @@ public class AuthController {
 		  domain = domain.substring(0, slashIndex); } 
 	  return domain; 
   }
+  
+  
+  
   
   @PostMapping("/signup/employee")
   public ResponseEntity<?> registerEmployee(@Valid @RequestBody SignupEmployeeRequest signupEmployeeRequest) {

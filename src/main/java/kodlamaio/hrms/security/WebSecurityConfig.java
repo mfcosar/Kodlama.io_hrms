@@ -89,6 +89,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
               .requestMatchers("/api/verifications/employeeConfirmEmployer").permitAll()
               .requestMatchers("/api/employers/getemployerbyid/{employerId}").permitAll()
               .requestMatchers("/api/employers/updateemployerbyid/{employerId}").permitAll()
+              .requestMatchers("/api/employers/getallunconfirmed").permitAll()
               .requestMatchers("/api/jobs/getall/").permitAll()
               .requestMatchers("/api/jobs/add/").permitAll()
               .requestMatchers("/api/jobs/getall/").permitAll()

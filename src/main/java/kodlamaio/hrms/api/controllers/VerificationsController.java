@@ -4,8 +4,10 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+//import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,7 +31,7 @@ import kodlamaio.hrms.entities.concretes.verifications.EmployerEmailVerification
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/verifications")
-public class VerificationsController {
+public class VerificationsController { //email verification link geldiginde handle edecek API
 	
 	@Autowired
 	private UserDao userDao;
@@ -55,7 +57,7 @@ public class VerificationsController {
 
 
 
-	@GetMapping("/verifyCandidateAccount")
+	@GetMapping("/verifyCandidateAccount")    //email verification oldugu için pre-authorization gerekmez
 	public Result verifyCandidateAccount(@RequestParam("token") String code, @RequestParam("candidateId") int candidateId) {
 			
 			Optional<CandidateEmailVerification> optCandidateEmailVerification=candidateEmailVerificationDao.findByCode(code);
@@ -161,6 +163,7 @@ public class VerificationsController {
 	}	
 	
 	@GetMapping("/employeeConfirmEmployer")
+	@PreAuthorize("hasRole('ADMIN')") //Put ve post ile gönderince Admin rolünü görmedi!
 	public Result employeeConfirmEmployerAccount(@RequestParam("employeeId") int employeeId, @RequestParam("employerId") int employerId) {
 			
 		Optional<EmployeeConfirmEmployer> optEmployeeConfirmEmployer=employeeConfirmEmployerDao.findByEmployerId(employerId);
