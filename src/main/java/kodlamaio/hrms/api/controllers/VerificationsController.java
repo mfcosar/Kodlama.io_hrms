@@ -16,15 +16,19 @@ import kodlamaio.hrms.core.utilities.results.ErrorResult;
 import kodlamaio.hrms.core.utilities.results.Result;
 import kodlamaio.hrms.core.utilities.results.SuccessResult;
 import kodlamaio.hrms.dataAccess.abstracts.EmployerDao;
+import kodlamaio.hrms.dataAccess.abstracts.JobAdvertisementDao;
 import kodlamaio.hrms.dataAccess.abstracts.UserDao;
 import kodlamaio.hrms.dataAccess.abstracts.verifications.CandidateEmailVerificationDao;
 import kodlamaio.hrms.dataAccess.abstracts.verifications.EmployeeConfirmEmployerDao;
+import kodlamaio.hrms.dataAccess.abstracts.verifications.EmployeeConfirmJobadvertisementDao;
 import kodlamaio.hrms.dataAccess.abstracts.verifications.EmployeeEmailVerificationDao;
 import kodlamaio.hrms.dataAccess.abstracts.verifications.EmployerEmailVerificationDao;
 import kodlamaio.hrms.entities.concretes.Employer;
+import kodlamaio.hrms.entities.concretes.JobAdvertisement;
 import kodlamaio.hrms.entities.concretes.User;
 import kodlamaio.hrms.entities.concretes.verifications.CandidateEmailVerification;
 import kodlamaio.hrms.entities.concretes.verifications.EmployeeConfirmEmployer;
+import kodlamaio.hrms.entities.concretes.verifications.EmployeeConfirmJobadvertisement;
 import kodlamaio.hrms.entities.concretes.verifications.EmployeeEmailVerification;
 import kodlamaio.hrms.entities.concretes.verifications.EmployerEmailVerification;
 
@@ -39,20 +43,25 @@ public class VerificationsController { //email verification link geldiginde hand
 	private EmployerEmailVerificationDao employerEmailVerificationDao;
 	private EmployeeEmailVerificationDao employeeEmailVerificationDao;
 	private EmployeeConfirmEmployerDao employeeConfirmEmployerDao;
+	private EmployeeConfirmJobadvertisementDao employeeConfirmJobadvertisementDao;
 	private EmployerDao employerDao;
+	private JobAdvertisementDao jobAdvertisementDao;
 	
 	
 	@Autowired
 	public VerificationsController(UserDao userDao, CandidateEmailVerificationDao candidateEmailVerificationDao,
 			EmployerEmailVerificationDao employerEmailVerificationDao, EmployeeConfirmEmployerDao employeeConfirmEmployerDao, 
-			EmployerDao employerDao, EmployeeEmailVerificationDao employeeEmailVerificationDao) {
+			EmployerDao employerDao, EmployeeEmailVerificationDao employeeEmailVerificationDao, 
+			EmployeeConfirmJobadvertisementDao employeeConfirmJobadvertisementDao, JobAdvertisementDao jobAdvertisementDao) {
 		super();
 		this.userDao = userDao;
 		this.candidateEmailVerificationDao = candidateEmailVerificationDao;
 		this.employerEmailVerificationDao = employerEmailVerificationDao;
 		this.employeeEmailVerificationDao = employeeEmailVerificationDao;
 		this.employeeConfirmEmployerDao = employeeConfirmEmployerDao;
+		this.employeeConfirmJobadvertisementDao = employeeConfirmJobadvertisementDao;
 		this.employerDao = employerDao;
+		this.jobAdvertisementDao = jobAdvertisementDao;
 	}
 
 
@@ -195,5 +204,40 @@ public class VerificationsController { //email verification link geldiginde hand
 		else 
 			return new ErrorResult("Confirmation record for this employer is missing!");
 	}
+	
+	@GetMapping("/employeeconfirmjobadvertisement")
+	@PreAuthorize("hasRole('ADMIN')") //Put ve post mapping ile gönderince Admin rolünü görmedi!
+	public Result employeeConfirmJobadvertisement(@RequestParam("jobAdvertisementId") int jobAdvertisementId, @RequestParam("employeeId") int employeeId) {
+			
+		Optional<EmployeeConfirmJobadvertisement> optEmployeeConfirmJobAdvertisement=employeeConfirmJobadvertisementDao.findByJobadvertisementId(jobAdvertisementId);
+		
+		if (optEmployeeConfirmJobAdvertisement.isPresent()) {
+			EmployeeConfirmJobadvertisement employeeConfirmJobadvertisement= optEmployeeConfirmJobAdvertisement.get();
+			
+			if (employeeConfirmJobadvertisement.getIsConfirmed()) {
+				return new ErrorResult("Jpb advertisement confirmation has already been done!");
+			} 
+			else {
+				employeeConfirmJobadvertisement.setEmployeeId(employeeId); //burda hata vermedi
+				employeeConfirmJobadvertisement.setIsConfirmed(true);
+				employeeConfirmJobadvertisement.setConfirmDate(LocalDateTime.now());
+				employeeConfirmJobadvertisementDao.save(employeeConfirmJobadvertisement);
+				
+				//find the job advertisement and set it as employeeConfirmed
+				//Optional<Employer> optionalEmployer = employerDao.findById(employerId);
+				JobAdvertisement optionalJobAdvertisement = jobAdvertisementDao.findById(jobAdvertisementId);
+				if (optionalJobAdvertisement != null) {
+					JobAdvertisement ja = optionalJobAdvertisement;//.get();
+					ja.setConfirmed(true);
+					jobAdvertisementDao.save(ja);							
+					return new SuccessResult("Job Advertisement confirmation is completed!");
+				}else 
+					return new ErrorResult("Job Advertisement confirmation is not complete!");
+			}
+			
+		 } 
+		else 
+			return new ErrorResult("Confirmation record for this Job Advertisement is missing!");
+	}	
 
 }

@@ -1,10 +1,14 @@
 package kodlamaio.hrms.business.concretes;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import kodlamaio.hrms.business.abstracts.JobAdvertisementService;
+import kodlamaio.hrms.business.abstracts.verifications.EmployeeConfirmService;
 import kodlamaio.hrms.core.utilities.results.DataResult;
 import kodlamaio.hrms.core.utilities.results.ErrorResult;
 import kodlamaio.hrms.core.utilities.results.Result;
@@ -30,6 +34,7 @@ public class JobAdvertisementManager implements JobAdvertisementService{
 	private CityDao cityDao;
 	private WorkingTimeDao workingTimeDao;
 	private WorkingTypeDao workingTypeDao;
+	private EmployeeConfirmService employeeConfirmService;
 
 	@Autowired
 	public JobAdvertisementManager(JobAdvertisementDao jobAdvertisementDao, JobDao jobDao, CityDao cityDao,
@@ -50,6 +55,8 @@ public class JobAdvertisementManager implements JobAdvertisementService{
 	@Override
 	public Result add(JobAdvertisement jobAdvertisement) {
 		this.jobAdvertisementDao.save(jobAdvertisement);
+		employeeConfirmService.generateEmployeeConfirmationForJobadvertisement(jobAdvertisement);
+	
 		return new SuccessResult("Job advertisement is added to system");
 	}
 
@@ -105,8 +112,17 @@ public class JobAdvertisementManager implements JobAdvertisementService{
 	public DataResult<JobAdvertisement> confirmJobAdvertisementById(int jobAdvertisementId) {
 		JobAdvertisement ja = this.jobAdvertisementDao.findById(jobAdvertisementId);
 		ja.setConfirmed(true);
+		//compare publication date, publication must be after confirmation
+		LocalDateTime ldtPublicationDate = ja.getPublicationDate().toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+		if (ldtPublicationDate.isBefore(LocalDateTime.now())) { 
+			Date newPublicationDate= Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
+			ja.setPublicationDate(newPublicationDate);
+		}
+		
 		this.jobAdvertisementDao.save(ja); //Db'nin save etmesi gerek
-		return new SuccessDataResult<JobAdvertisement>(this.jobAdvertisementDao.findById(jobAdvertisementId), jobAdvertisementId+ " : Nolu iş ilanı onaylandı");
+		return new SuccessDataResult<JobAdvertisement>(this.jobAdvertisementDao.findById(jobAdvertisementId), jobAdvertisementId+ " : Job advertisement is confirmed");
 
 	}
 

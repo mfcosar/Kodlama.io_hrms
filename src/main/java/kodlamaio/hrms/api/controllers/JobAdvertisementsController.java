@@ -100,16 +100,18 @@ public class JobAdvertisementsController {
 	}
 	
 	@GetMapping("/getallunconfirmed") 
+	@PreAuthorize("hasRole('ADMIN')")
 	public DataResult<List<JobAdvertisement>> getUnconfirmedJobAdvertisements(){
 		
 		return this.jobAdvertisementService.getUnconfirmedJobAdvertisements();
 	}
 	
-	@PostMapping("/confirmbyid") 
+	/*@GetMapping("/confirmbyid")
+	@PreAuthorize("hasRole('ADMIN')")
 	public DataResult<JobAdvertisement> confirmJobAdvertisement(@RequestParam int jobAdvertisementId){
-		
+		System.out.println("Confirm JobAdvertisement by JobAdvertisement id: " + jobAdvertisementId);
 		return this.jobAdvertisementService.confirmJobAdvertisementById(jobAdvertisementId);
-	}
+	}*/
 	
 	@PutMapping("/updatejobAdvertisementbyid/{id}") 
 	@PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYER')")

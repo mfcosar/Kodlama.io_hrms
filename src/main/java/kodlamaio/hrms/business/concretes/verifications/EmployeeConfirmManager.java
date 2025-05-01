@@ -7,19 +7,23 @@ import kodlamaio.hrms.business.abstracts.verifications.EmployeeConfirmService;
 import kodlamaio.hrms.core.utilities.results.Result;
 import kodlamaio.hrms.core.utilities.results.SuccessResult;
 import kodlamaio.hrms.dataAccess.abstracts.verifications.EmployeeConfirmEmployerDao;
+import kodlamaio.hrms.dataAccess.abstracts.verifications.EmployeeConfirmJobadvertisementDao;
 import kodlamaio.hrms.entities.concretes.Employer;
+import kodlamaio.hrms.entities.concretes.JobAdvertisement;
 import kodlamaio.hrms.entities.concretes.verifications.EmployeeConfirmEmployer;
+import kodlamaio.hrms.entities.concretes.verifications.EmployeeConfirmJobadvertisement;
 
 @Service
 public class EmployeeConfirmManager implements EmployeeConfirmService{
 	
 	private EmployeeConfirmEmployerDao employeeConfirmEmployerDao;
-	
+	private EmployeeConfirmJobadvertisementDao employeeConfirmJobadvertisementDao;
 	
 	@Autowired
-	public EmployeeConfirmManager(EmployeeConfirmEmployerDao employeeConfirmEmployerDao) {
+	public EmployeeConfirmManager(EmployeeConfirmEmployerDao employeeConfirmEmployerDao,EmployeeConfirmJobadvertisementDao employeeConfirmJobadvertisementDao) {
 		super();
 		this.employeeConfirmEmployerDao = employeeConfirmEmployerDao;
+		this.employeeConfirmJobadvertisementDao = employeeConfirmJobadvertisementDao;
 		}
 
 	@Override
@@ -34,7 +38,7 @@ public class EmployeeConfirmManager implements EmployeeConfirmService{
 		
 		//display in system and wait for personnel to check employer
 		//return employeeConfirmEmployer.getId();
-		return new SuccessResult("İş vereni onaylama talebi oluşturuldu");
+		return new SuccessResult("Employer confirmation request has been added to system");
 	
 	}
 /*
@@ -62,5 +66,14 @@ public class EmployeeConfirmManager implements EmployeeConfirmService{
 			return new ErrorResult("Bu iş verenin HRMS personeli tarafından doğrulaması henüz yapılmamış.");
 			
 	}*/
+
+	@Override
+	public Result generateEmployeeConfirmationForJobadvertisement(JobAdvertisement jobAdvertisement) {
+		
+		EmployeeConfirmJobadvertisement employeeConfirmJobadvertisement = new EmployeeConfirmJobadvertisement(jobAdvertisement.getId(), false);
+    	this.employeeConfirmJobadvertisementDao.save(employeeConfirmJobadvertisement);
+		
+		return new SuccessResult("Jobadvertisement confirmation request has been added to system");
+	}
 
 }

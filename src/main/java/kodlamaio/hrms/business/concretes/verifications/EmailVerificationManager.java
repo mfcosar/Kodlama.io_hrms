@@ -154,7 +154,7 @@ public class EmailVerificationManager implements EmailVerificationService{
 
 		this.emailVerificationDao.save(emailVerification); //emailVerification
 		
-		return new SuccessResult("Email doğrulaması tamamlandı.");
+		return new SuccessResult("Email verification is completed.");
 	}
 	
 
