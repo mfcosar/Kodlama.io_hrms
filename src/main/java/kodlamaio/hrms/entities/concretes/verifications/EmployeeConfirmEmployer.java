@@ -6,7 +6,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import kodlamaio.hrms.entities.concretes.Employee;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 //import lombok.EqualsAndHashCode;
@@ -25,9 +28,13 @@ public class EmployeeConfirmEmployer {//extends EmployeeConfirm{
 	@GeneratedValue(strategy = GenerationType.IDENTITY) 
 	@Column(name="id")
 	private int id;
-	
-	@Column(name="employee_id")
-	private Integer employeeId;
+
+	@ManyToOne()
+	@JoinColumn(name="employee_id")
+	private Employee employee;	
+
+	/*@Column(name="employee_id")
+	private Integer employeeId;*/
 	
 	@Column(name="employer_id")
 	private int employerId;
@@ -38,6 +45,9 @@ public class EmployeeConfirmEmployer {//extends EmployeeConfirm{
 	@Column(name="confirm_date")
 	private LocalDateTime confirmDate;
 
+
+
+	
 	public EmployeeConfirmEmployer(int employerId, Boolean isConfirmed) {
 		super();
 		this.employerId = employerId;

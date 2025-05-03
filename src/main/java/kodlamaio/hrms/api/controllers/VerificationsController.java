@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import kodlamaio.hrms.core.utilities.results.ErrorResult;
 import kodlamaio.hrms.core.utilities.results.Result;
 import kodlamaio.hrms.core.utilities.results.SuccessResult;
+import kodlamaio.hrms.dataAccess.abstracts.EmployeeDao;
 import kodlamaio.hrms.dataAccess.abstracts.EmployerDao;
 import kodlamaio.hrms.dataAccess.abstracts.JobAdvertisementDao;
 import kodlamaio.hrms.dataAccess.abstracts.UserDao;
@@ -45,6 +46,7 @@ public class VerificationsController { //email verification link geldiginde hand
 	private EmployeeConfirmEmployerDao employeeConfirmEmployerDao;
 	private EmployeeConfirmJobadvertisementDao employeeConfirmJobadvertisementDao;
 	private EmployerDao employerDao;
+	private EmployeeDao employeeDao;
 	private JobAdvertisementDao jobAdvertisementDao;
 	
 	
@@ -52,7 +54,8 @@ public class VerificationsController { //email verification link geldiginde hand
 	public VerificationsController(UserDao userDao, CandidateEmailVerificationDao candidateEmailVerificationDao,
 			EmployerEmailVerificationDao employerEmailVerificationDao, EmployeeConfirmEmployerDao employeeConfirmEmployerDao, 
 			EmployerDao employerDao, EmployeeEmailVerificationDao employeeEmailVerificationDao, 
-			EmployeeConfirmJobadvertisementDao employeeConfirmJobadvertisementDao, JobAdvertisementDao jobAdvertisementDao) {
+			EmployeeConfirmJobadvertisementDao employeeConfirmJobadvertisementDao, JobAdvertisementDao jobAdvertisementDao,
+			 EmployeeDao employeeDao) {
 		super();
 		this.userDao = userDao;
 		this.candidateEmailVerificationDao = candidateEmailVerificationDao;
@@ -61,6 +64,7 @@ public class VerificationsController { //email verification link geldiginde hand
 		this.employeeConfirmEmployerDao = employeeConfirmEmployerDao;
 		this.employeeConfirmJobadvertisementDao = employeeConfirmJobadvertisementDao;
 		this.employerDao = employerDao;
+		this.employeeDao = employeeDao;
 		this.jobAdvertisementDao = jobAdvertisementDao;
 	}
 
@@ -183,7 +187,7 @@ public class VerificationsController { //email verification link geldiginde hand
 				return new ErrorResult("Employer confirmation has already been done!");
 			} 
 			else {
-				employeeConfirmEmployer.setEmployeeId(employeeId); //burda hata vermedi
+				employeeConfirmEmployer.setEmployee(employeeDao.getReferenceById(employeeId)); //burda hata vermedi
 				employeeConfirmEmployer.setIsConfirmed(true);
 				employeeConfirmEmployer.setConfirmDate(LocalDateTime.now());
 				employeeConfirmEmployerDao.save(employeeConfirmEmployer);
@@ -218,7 +222,7 @@ public class VerificationsController { //email verification link geldiginde hand
 				return new ErrorResult("Jpb advertisement confirmation has already been done!");
 			} 
 			else {
-				employeeConfirmJobadvertisement.setEmployeeId(employeeId); //burda hata vermedi
+				employeeConfirmJobadvertisement.setEmployee(employeeDao.getReferenceById(employeeId));
 				employeeConfirmJobadvertisement.setIsConfirmed(true);
 				employeeConfirmJobadvertisement.setConfirmDate(LocalDateTime.now());
 				employeeConfirmJobadvertisementDao.save(employeeConfirmJobadvertisement);

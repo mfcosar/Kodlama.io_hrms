@@ -92,6 +92,6 @@ public class EmployeeManager implements EmployeeService{
 		
 		employeeDao.save(exEmployee);
 		
-		return new SuccessResult("Employer profile updated succesfully");
+		return new SuccessResult("HRMS Employee profile is updated succesfully");
 	}	
 }

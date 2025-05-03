@@ -6,7 +6,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import kodlamaio.hrms.entities.concretes.Employee;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 //import lombok.EqualsAndHashCode;
@@ -26,8 +29,12 @@ public class EmployeeConfirmJobadvertisement {
 	@Column(name="id")
 	private int id;
 	
-	@Column(name="employee_id")
-	private Integer employeeId;
+	/*@Column(name="employee_id")
+	private Integer employeeId;*/
+
+	@ManyToOne()
+	@JoinColumn(name="employee_id")
+	private Employee employee;
 	
 	@Column(name="jobadvertisement_id")
 	private int jobadvertisementId;
